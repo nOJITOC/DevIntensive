@@ -18,13 +18,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
-import com.softdesign.devintensive.utils.MyBehavior;
 
 
 import java.util.ArrayList;
@@ -44,11 +43,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private FloatingActionButton mFab;
     private EditText mUserPhone, mUserMail, mUserVK, mUserGit, mUserBio;
     private List<EditText> mUserInfoViews;
-    private MyBehavior mBehavior;
-    private ImageView mImageView;
-    LinearLayout mLayout;
-
-
 
     @Override
     /**
@@ -76,15 +70,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mUserInfoViews.add(mUserPhone);
         mUserInfoViews.add(mUserMail);
         mUserInfoViews.add(mUserVK);
-//        mBehavior = new MyBehavior();
-      //  mImageView=(ImageView)findViewById(R.id.main_image);
-       // mLayout=(LinearLayout) findViewById(R.id.scroll_layout);
-//        if(mBehavior.layoutDependsOn(mCoordinatorLayout,mLayout,mImageView)){
-//            mBehavior.onDependentViewChanged(mCoordinatorLayout,mLayout,mImageView);
-//        }
-
-
-
         mFab.setOnClickListener(this);
 
         Log.d(TAG, "onCreate");
@@ -234,6 +219,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void changeEditMode(int mode) {
         if (mode == 1) {
             mFab.setImageResource(R.drawable.ic_done_black_24dp);
+            showSnackbar("Режим редактирования.");
             for (EditText userValue : mUserInfoViews) {
                 userValue.setEnabled(true);
                 userValue.setFocusable(true);
@@ -241,6 +227,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         } else {
             mFab.setImageResource(R.drawable.ic_create_black_24dp);
+            showSnackbar("Редактирование завершено.");
             for (EditText userValue : mUserInfoViews) {
                 userValue.setEnabled(false);
                 userValue.setFocusable(false);

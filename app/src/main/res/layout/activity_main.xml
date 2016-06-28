@@ -17,28 +17,27 @@
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/gray"
-            android:theme="@style/AppTheme.AppBarOverlay">
+
+            style="@style/app_bar"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            >
 
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="256dp"
+                style="@style/app_bar"
                 app:contentScrim="@color/gray"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <ImageView
                     android:id="@+id/main_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/profile_image_size"
+                    style="@style/app_bar"
                     android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
                     android:src="@drawable/profile_photo"/>
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
+                    android:layout_marginTop="@dimen/size_small_24"
                     android:layout_width="wrap_content"
                     android:layout_height="?attr/actionBarSize"
                     android:theme="@style/AppTheme.PopupOverlay"
@@ -47,18 +46,22 @@
 
 
             </android.support.design.widget.CollapsingToolbarLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/size_small_24"
-                app:layout_scrollFlags="scroll|enterAlways"/>
 
 
+        </android.support.design.widget.AppBarLayout>
+        <LinearLayout
+            style="@style/statistic_layout"
+            android:layout_height="@dimen/statistic_size_112"
+            android:gravity="center"
+            app:layout_behavior="com.softdesign.devintensive.utils.MyBehavior"
+            >
             <LinearLayout
-                android:layout_width="match_parent"
+                style="@style/statistic_layout"
                 android:layout_height="64dp"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                android:background="@color/gray"
-                app:paddingEnd="@dimen/size_small_24"
+                android:layout_marginBottom="@dimen/size_small_24"
+                android:layout_marginTop="@dimen/size_small_24"
+
+
                 >
 
                 <LinearLayout
@@ -140,22 +143,24 @@
 
 
             </LinearLayout>
-            <ScrollView
-                android:orientation="horizontal"
-                android:id="@+id/scroll_layout"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/size_small_24"
-                app:layout_scrollFlags="exitUntilCollapsed|scroll"
-                app:layout_behavior="com.softdesign.devintensive.utils.MyBehavoir">
-                >
+        </LinearLayout>
 
-            </ScrollView>
-        </android.support.design.widget.AppBarLayout>
+
+        <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="@dimen/size_small_24"-->
+        <!--android:elevation="12dp"-->
+        <!--android:background="#74ff25"-->
+        <!--app:layout_behavior="com.softdesign.devintensive.utils.MyBehavior"-->
+        <!--app:layout_scrollFlags="scroll|exitUntilCollapsed"/>-->
 
         <android.support.v4.widget.NestedScrollView
+            android:id="@+id/nested_scroll_for_et"
             android:layout_width="match_parent"
+            android:paddingTop="@dimen/statistic_size_112"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -357,6 +362,7 @@
             android:src="@drawable/ic_create_black_24dp"
             app:layout_anchor="@id/appbar_layout"
             app:layout_anchorGravity="right|bottom"/>
+
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
@@ -368,4 +374,5 @@
         app:menu="@menu/drawer_menu">
 
     </android.support.design.widget.NavigationView>
+
 </android.support.v4.widget.DrawerLayout>
