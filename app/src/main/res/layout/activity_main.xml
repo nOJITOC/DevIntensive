@@ -4,6 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_drawer"
+    android:fitsSystemWindows="true"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.activities.MainActivity"
@@ -17,7 +19,7 @@
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar_layout"
-
+            android:fitsSystemWindows="true"
             style="@style/app_bar"
             android:theme="@style/AppTheme.AppBarOverlay"
             >
@@ -25,19 +27,20 @@
             <android.support.design.widget.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar"
                 style="@style/app_bar"
+                android:fitsSystemWindows="true"
                 app:contentScrim="@color/gray"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <ImageView
                     android:id="@+id/main_image"
                     style="@style/app_bar"
-                    android:fitsSystemWindows="true"
+                    app:layout_collapseMode="parallax"
                     android:scaleType="centerCrop"
                     android:src="@drawable/profile_photo"/>
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
-                    android:layout_marginTop="@dimen/size_small_24"
+
                     android:layout_width="wrap_content"
                     android:layout_height="?attr/actionBarSize"
                     android:theme="@style/AppTheme.PopupOverlay"
@@ -144,15 +147,6 @@
 
             </LinearLayout>
         </LinearLayout>
-
-
-        <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="@dimen/size_small_24"-->
-        <!--android:elevation="12dp"-->
-        <!--android:background="#74ff25"-->
-        <!--app:layout_behavior="com.softdesign.devintensive.utils.MyBehavior"-->
-        <!--app:layout_scrollFlags="scroll|exitUntilCollapsed"/>-->
 
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/nested_scroll_for_et"

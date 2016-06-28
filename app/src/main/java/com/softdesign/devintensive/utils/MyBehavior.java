@@ -24,7 +24,6 @@ public class MyBehavior extends CoordinatorLayout.Behavior<LinearLayout> {
         dependency.setPadding(dependency.getPaddingLeft(),lp.height,dependency.getPaddingRight(),dependency.getPaddingBottom());
         child.setY(dependency.getY());
         System.out.println(lp.height);
-        System.out.println(lp.getBehavior());
         child.setLayoutParams(lp);
         return true;
 
