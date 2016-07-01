@@ -1,3 +1,24 @@
 <resources>
-    <string name="app_name">DevIntensive</string>
+    <string name="app_name">Марухин Михаил</string>
+    <string name="num_of_code_str">5</string>
+    <string name="rating">5</string>
+    <string name="projects">5</string>
+    <string name="e_mail">mmteams91java@gmail.com</string>
+    <string name="vk">vk.com/mmteams91</string>
+    <string name="repository">https://github.com/nOJITOC/DevIntensive</string>
+    <string name="yourself">Здесь мог бы быть какой-то другой текст</string>
+    <string name="description_rating">Рейтинг</string>
+    <string name="description_num_of_code">Написано строк кода</string>
+    <string name="description_projects">Проектов</string>
+    <string name="my_phone">+7 (980) 252-80-58</string>
+    <string name="for_phone">Мобильный</string>
+    <string name="description_vk">Профиль в VK</string>
+    <string name="description_repository">Репозиторий</string>
+    <string name="description_yourself">О себе</string>
+    <string name="user_profile_dialog_gallery">Загрузить из галереи</string>
+    <string name="user_profile_dialog_camera">Сделать снимок</string>
+    <string name="user_profile_dialog_cancel">Отмена</string>
+    <string name="user_profile_dialog_title">Изменить фотографию пользователя</string>
+    <string name="user_profile.placeholder.image">Изменить фотографию профиля</string>
+    <string name="user_profile_chose_message">выберите фото</string>
 </resources>
