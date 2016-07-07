@@ -11,8 +11,8 @@ import com.softdesign.devintensive.utils.ConstantManager;
  * Created by Иван on 06.07.2016.
  */
 public class UrlValidator extends BaseValidator{
-    private String mBefore;
-    public String mAfter;
+    private String mBefore="";
+    public String mAfter="";
 
     public UrlValidator(EditText editText, String defaultValue, String errorMSG) {
         super(editText, defaultValue, errorMSG);
