@@ -28,7 +28,8 @@
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    >
 
                     <EditText
                         android:id="@+id/phone_et"
@@ -44,6 +45,7 @@
             </LinearLayout>
 
             <ImageView
+                android:id="@+id/for_phone_call"
                 style="@style/icon.right"
                 android:src="@drawable/ic_phone_in_talk_black_24dp"/>
         </LinearLayout>
@@ -80,6 +82,7 @@
             </LinearLayout>
 
             <ImageView
+                android:id="@+id/for_mail_send"
                 style="@style/icon.right"
                 android:src="@drawable/ic_send_black_24dp"/>
         </LinearLayout>
@@ -116,6 +119,7 @@
             </LinearLayout>
 
             <ImageView
+                android:id="@+id/for_vk_open"
                 style="@style/icon.right"
                 android:src="@drawable/ic_visibility_black_24dp"/>
         </LinearLayout>
@@ -153,6 +157,7 @@
             </LinearLayout>
 
             <ImageView
+                android:id="@+id/for_github_open"
                 style="@style/icon.right"
                 android:src="@drawable/ic_visibility_black_24dp"
                 />

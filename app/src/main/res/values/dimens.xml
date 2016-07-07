@@ -21,6 +21,8 @@
     <dimen name="fba_right_space">16dp</dimen>
     <dimen name="statistic_size_112">112dp</dimen>
     <dimen name="placeholder_photo_size_90">90dp</dimen>
+    <dimen name="size_huge_256">256dp</dimen>
+    <dimen name="size_smaller_4">4dp</dimen>
 
 
 </resources>

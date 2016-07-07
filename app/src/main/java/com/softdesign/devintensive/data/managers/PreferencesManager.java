@@ -3,6 +3,7 @@ package com.softdesign.devintensive.data.managers;
 import android.content.SharedPreferences;
 import android.net.Uri;
 
+import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.DevIntensiveApplication;
 
@@ -31,8 +32,9 @@ public class PreferencesManager {
     }
     public List<String> loadUserProfileData() {
         List<String> userFields = new ArrayList<>();
+        String[] defaultUsersFields=DevIntensiveApplication.getContext().getResources().getStringArray(R.array.user_info);
         for (int i = 0; i < USER_FIELDS.length; i++) {
-            userFields.add(mSharedPreferences.getString(USER_FIELDS[i],"null"));
+            userFields.add(mSharedPreferences.getString(USER_FIELDS[i],defaultUsersFields[i]));
         }
         return userFields;
     }
@@ -42,6 +44,6 @@ public class PreferencesManager {
         editor.apply();
     }
     public Uri loadUserPhoto(){
-        return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_KEY,"android.resource://com.softdesign.devintensive/drawable/profile_photo"));
+        return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_KEY,"android.resource://com.softdesign.devintensive/drawable/prof"));
     }
 }

@@ -8,4 +8,7 @@
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="gray_background">#454545</color>
+    <color name="red_login">#e65c4d</color>
+    <color name="red_btn">#e74b3c</color>
+    <color name="gray_hint">#bfbfbf</color>
 </resources>

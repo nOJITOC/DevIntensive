@@ -2,7 +2,6 @@ package com.softdesign.devintensive.ui.activities;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -41,6 +40,7 @@ import android.widget.TextView;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.Validators.ValidateManager;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -50,29 +50,43 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     public static final String TAG = ConstantManager.TAG_PREFIX + "Main Activity";
 
     private int mCurrentEditMode = 0;
 
+    private ValidateManager mValidateManager;
     private DataManager mDataManager;
-    private ImageView mCallImg;
-    private CoordinatorLayout mCoordinatorLayout;
-    private Toolbar mToolbar;
-    private DrawerLayout mNavigationDrawer;
-    private FloatingActionButton mFab;
-
-
-    private EditText mUserPhone, mUserMail, mUserVK, mUserGit, mUserBio;
-    private List<EditText> mUserInfoViews;
-    private RelativeLayout mProfilePlaceholder;
-    private CollapsingToolbarLayout mCollapsingToolbar;
-    private AppBarLayout.LayoutParams mAppBarParams = null;
-    private AppBarLayout mAppBarLayout;
-    private File mPhotoFile = null;
-    private Uri mSelectedImage = null;
-    private ImageView mProfileImage;
+    @BindView(R.id.call_img)
+    ImageView mCallImg;
+    @BindView(R.id.main_coordinator_container)
+    CoordinatorLayout mCoordinatorLayout;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.navigation_drawer)
+    DrawerLayout mNavigationDrawer;
+    @BindView(R.id.fab)
+    FloatingActionButton mFab;
+    @BindViews({R.id.phone_et, R.id.email_et, R.id.vk_et, R.id.github_et, R.id.bio_et})
+    List<EditText> mUserInfoViews;
+    @BindViews({R.id.for_phone_call, R.id.for_mail_send, R.id.for_vk_open, R.id.for_github_open})
+    List<ImageView> mUserInfoClickers;
+    @BindView(R.id.profile_placeholder)
+    RelativeLayout mProfilePlaceholder;
+    @BindView(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout mCollapsingToolbar;
+    AppBarLayout.LayoutParams mAppBarParams = null;
+    @BindView(R.id.appbar_layout)
+    AppBarLayout mAppBarLayout;
+    File mPhotoFile = null;
+    Uri mSelectedImage = null;
+    @BindView(R.id.user_photo_img)
+    ImageView mProfileImage;
 
     @Override
     /**
@@ -81,45 +95,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        ButterKnife.bind(this);
         mDataManager = DataManager.getInstance();
-        mCallImg = (ImageView) findViewById(R.id.call_img);
+        mValidateManager=new ValidateManager(this,mUserInfoViews);
         mCallImg.setOnClickListener(this);
-        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_coordinator_container);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mNavigationDrawer = (DrawerLayout) findViewById(R.id.navigation_drawer);
-        mFab = (FloatingActionButton) findViewById(R.id.fab);
-        mProfilePlaceholder = (RelativeLayout) findViewById(R.id.profile_placeholder);
-        mCollapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar_layout);
 
-        mUserPhone = (EditText) findViewById(R.id.phone_et);
-        mUserMail = (EditText) findViewById(R.id.email_et);
-        mUserVK = (EditText) findViewById(R.id.vk_et);
-        mUserGit = (EditText) findViewById(R.id.github_et);
-        mUserBio = (EditText) findViewById(R.id.bio_et);
-        mProfileImage = (ImageView) findViewById(R.id.user_photo_img);
 
-        mUserInfoViews = new ArrayList();
-        mUserInfoViews.add(mUserBio);
-        mUserInfoViews.add(mUserGit);
-        mUserInfoViews.add(mUserPhone);
-        mUserInfoViews.add(mUserMail);
-        mUserInfoViews.add(mUserVK);
-
+        setupUserProfileContent();
         mFab.setOnClickListener(this);
         mProfilePlaceholder.setOnClickListener(this);
 
         Log.d(TAG, "onCreate");
+
         setupToolbar();
         setupDrawer();
         loadUserInfoValue();
-//        insertProfileImage(mDataManager.getPreferencesManager().loadUserPhoto());
         Picasso.with(this)
                 .load(mDataManager.getPreferencesManager().loadUserPhoto())
-//                .placeholder(R.drawable.profile_photo)// TODO: 01.07.2016 сделать placeholder and transform+crop
+                .placeholder(R.drawable.nav_head_bg)
                 .into(mProfileImage);
-
         if (savedInstanceState == null) {
 
         } else {
@@ -192,6 +186,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.profile_placeholder:
                 showDialog(ConstantManager.LOAD_PROFILE_PHOTO);
                 break;
+//            uses userProfileActions
+
+
         }
     }
 
@@ -235,12 +232,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 }
                 break;
             case ConstantManager.REQUEST_CAMERA_PICTURE:
-                if (resultCode == RESULT_OK) {
-                    Log.e(ConstantManager.TAG_PREFIX,"do not load camera picture");
+                if (resultCode == RESULT_OK && mPhotoFile != null) {
                     mSelectedImage = Uri.fromFile(mPhotoFile);
                     insertProfileImage(mSelectedImage);
                 }
-
         }
     }
 
@@ -248,7 +243,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void setupDrawer() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         setupDrawerHeader(navigationView, BitmapFactory.decodeResource(getResources(),
-                R.drawable.ava), "Марухин Михаил", "mmteams91java@gmail.com");
+                R.drawable.ava), getString(R.string.user_fio), getString(R.string.e_mail));
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -295,19 +290,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void changeEditMode(int mode) {
         if (mode == 1) {
             mFab.setImageResource(R.drawable.ic_done_black_24dp);
-            showSnackbar("Режим редактирования.");
+//            showSnackbar("Режим редактирования.");
             for (EditText userValue : mUserInfoViews) {
                 userValue.setEnabled(true);
                 userValue.setFocusable(true);
                 userValue.setFocusableInTouchMode(true);
 
             }
+            mUserInfoViews.get(0).requestFocus();
+
             showProfilePlaceholder(true);
-            lockToolbar(true);
+//            lockToolbar(true);
             mCollapsingToolbar.setExpandedTitleColor(Color.TRANSPARENT);
         } else {
             mFab.setImageResource(R.drawable.ic_create_black_24dp);
-            showSnackbar("Редактирование завершено.");
+//            showSnackbar("Редактирование завершено.");
             for (EditText userValue : mUserInfoViews) {
                 userValue.setEnabled(false);
                 userValue.setFocusable(false);
@@ -315,7 +312,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 saveUserInfoValue();
             }
             showProfilePlaceholder(false);
-            lockToolbar(false);
+//            lockToolbar(false);
             mCollapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.white));
 
         }
@@ -359,18 +356,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 takeCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mPhotoFile));
                 startActivityForResult(takeCaptureIntent, ConstantManager.REQUEST_CAMERA_PICTURE);
             }
-        }else {
+        } else {
             ActivityCompat.requestPermissions(this, new String[]{
                     Manifest.permission.CAMERA,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
             }, ConstantManager.CAMERA_REQUEST_PERMISSION_CODE);
-            Snackbar.make(mCoordinatorLayout, "Для корректной работы приложения необходимо дать требуемые разрешения",Snackbar.LENGTH_LONG)
-            .setAction("разрешить", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    openApplicationSettings();
-                }
-            }).show();
+            Snackbar.make(mCoordinatorLayout, "Для корректной работы приложения необходимо дать требуемые разрешения", Snackbar.LENGTH_LONG)
+                    .setAction("разрешить", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            openApplicationSettings();
+                        }
+                    }).show();
         }
     }
 
@@ -392,14 +389,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == ConstantManager.CAMERA_REQUEST_PERMISSION_CODE && grantResults.length==2){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == ConstantManager.CAMERA_REQUEST_PERMISSION_CODE && grantResults.length == 2) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // TODO: 01.07.2016 тут обрабатывается разрешение (разрешение получено)
                 // например вывести сообщение или обработать какой-то логикой если нужно
 
 
             }
-            if(grantResults[1] == PackageManager.PERMISSION_GRANTED){
+            if (grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 // TODO: 01.07.2016 тут обрабатывается разрешение (разрешение получено)
                 // например вывести сообщение или обработать какой-то логикой если нужно
 
@@ -415,7 +412,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void lockToolbar(boolean cond) {
         if (cond) {
-            mAppBarParams.setScrollFlags(0);
             mAppBarLayout.setExpanded(true, true);
         } else {
             mAppBarParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED);
@@ -468,15 +464,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         String imageFileName = "JPEG_" + timeStamp;
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
-// TODO: 01.07.2016 сделать placeholder and transform+crop
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-        values.put(MediaStore.MediaColumns.DATA, image.getAbsolutePath());
 
-        this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values);
-
-//        Log.println(Log.INFO, TAG, image == null ? "null image" : "not null");
+        Log.println(Log.INFO, TAG, image == null ? "null image" : "not null");
         return image;
     }
 
@@ -493,4 +482,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         startActivityForResult(appSettingsIntent, ConstantManager.PERMISSION_REQUEST_SETTINGS_CODE);
     }
 
+    private void userProfileActions(int numOfAction) {
+        Uri uri = null;
+        String action = Intent.ACTION_DEFAULT;
+        Log.e(TAG, "userProfileActions: " + mUserInfoViews.get(numOfAction).getText());
+
+        action = ConstantManager.USER_INTENT_ACTION[numOfAction];
+        uri = Uri.parse(ConstantManager.INTENT_SCHEME[numOfAction] + mUserInfoViews.get(numOfAction).getText());
+        Intent someInfoAction = new Intent(action, uri);
+
+        startActivity(someInfoAction);
+    }
+    private void setupUserProfileContent(){
+
+        for (ImageView userInfoClicker : mUserInfoClickers) {
+            userInfoClicker.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int choice = mUserInfoClickers.indexOf(view);
+                    userProfileActions(choice);
+                }
+            });
+        }
+        for (int i = 0; i < mUserInfoViews.size()-1; i++) {
+            mUserInfoViews.get(i).addTextChangedListener(mValidateManager.getValidator(i));
+        }
+    }
 }

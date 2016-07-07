@@ -1,5 +1,7 @@
 package com.softdesign.devintensive.utils;
 
+import android.content.Intent;
+
 public interface ConstantManager {
     String TAG_PREFIX="DEV ";
     String COLOR_MODE_KEY="COLOR_MODE_KEY";
@@ -11,6 +13,19 @@ public interface ConstantManager {
     String USER_BIO_KEY="USER_BIO_KEY";
     String USER_PHOTO_KEY ="USER_PHOTO_KEY";
 
+    String[] USER_INTENT_ACTION={
+            Intent.ACTION_DIAL,
+            Intent.ACTION_SENDTO,
+            Intent.ACTION_DEFAULT,
+            Intent.ACTION_DEFAULT
+
+    };
+    String[] INTENT_SCHEME={
+            "tel:",
+            "mailto:                                                                                                                                                                                                                                                                                                            ",
+            "https://",
+            "https://"
+    };
     int LOAD_PROFILE_PHOTO = 1;
     int REQUEST_CAMERA_PICTURE = 99;
     int REQUEST_GALLERY_PICTURE  = 88;

@@ -1,0 +1,101 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/login_bg"
+    android:gravity="center"
+
+    tools:context="com.softdesign.devintensive.ui.activities.LoginningActivity">
+
+
+    <LinearLayout
+        android:layout_width="@dimen/size_huge_256"
+        android:layout_height="wrap_content"
+        android:background="#f9f9f9"
+        android:elevation="@dimen/spacing_normal_16"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/spacing_medium_32"
+
+        android:paddingTop="@dimen/spacing_medium_32"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            >
+
+            <View
+                android:id="@+id/split"
+                android:layout_width="@dimen/size_smaller_4"
+                android:layout_height="@dimen/spacing_medial_24"
+                android:background="@color/red_login"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/split"
+                android:layout_marginLeft="@dimen/spacing_medial_24"
+                android:layout_marginRight="@dimen/spacing_medial_24"
+
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/login_title_text"
+                android:textColor="@color/red_login"
+                android:textSize="@dimen/spacing_medial_24"/>
+        </LinearLayout>
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_email"
+            style="@style/login_input_layout"
+            >
+
+            <EditText
+                android:id="@+id/input_email"
+                style="@style/login_edit_text"
+                android:hint="@string/hint_email"
+                android:inputType="textEmailAddress"
+
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_password"
+            style="@style/login_input_layout">
+
+            <EditText
+                android:id="@+id/input_password"
+                style="@style/login_edit_text"
+                android:hint="@string/hint_password"
+                android:inputType="textPassword"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/btn_signup"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/spacing_medial_24"
+            android:layout_marginTop="@dimen/spacing_medial_24"
+            android:background="@drawable/roundedcorner"
+            android:paddingLeft="@dimen/spacing_large_56"
+            android:paddingRight="@dimen/spacing_large_56"
+            android:text="@string/btn_sign_up"
+            android:textColor="@android:color/white"
+            >
+
+        </Button>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/get_password"
+            android:textColor="@color/gray_hint"/>
+    </LinearLayout>
+
+</LinearLayout>
+
