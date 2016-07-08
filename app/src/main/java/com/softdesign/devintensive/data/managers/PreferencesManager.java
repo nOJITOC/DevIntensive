@@ -10,7 +10,9 @@ import com.softdesign.devintensive.utils.DevIntensiveApplication;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Class, that contain {@link SharedPreferences}
+ */
 public class PreferencesManager {
     private SharedPreferences mSharedPreferences;
     public static final String[] USER_FIELDS = {ConstantManager.USER_PHONE_KEY,

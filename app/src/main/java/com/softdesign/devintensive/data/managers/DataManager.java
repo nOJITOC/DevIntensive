@@ -1,6 +1,8 @@
 package com.softdesign.devintensive.data.managers;
 
-
+/**
+ * Class-Singleton  for {@link PreferencesManager}
+ */
 public class DataManager {
 
     private static DataManager INSTANCE =null;

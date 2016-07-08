@@ -59,11 +59,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public static final String TAG = ConstantManager.TAG_PREFIX + "Main Activity";
 
     private int mCurrentEditMode = 0;
-
+    /**
+     * Manager of Validators {@link com.softdesign.devintensive.utils.Validators.BaseValidator} for profile info
+     */
     private ValidateManager mValidateManager;
+    /**Manager for user profile data */
     private DataManager mDataManager;
     @BindView(R.id.call_img)
     ImageView mCallImg;
+    /**Base layout of MainActivity*/
     @BindView(R.id.main_coordinator_container)
     CoordinatorLayout mCoordinatorLayout;
     @BindView(R.id.toolbar)
@@ -99,14 +103,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mDataManager = DataManager.getInstance();
         mValidateManager=new ValidateManager(this,mUserInfoViews);
         mCallImg.setOnClickListener(this);
-
-
         setupUserProfileContent();
         mFab.setOnClickListener(this);
         mProfilePlaceholder.setOnClickListener(this);
-
         Log.d(TAG, "onCreate");
-
         setupToolbar();
         setupDrawer();
         loadUserInfoValue();
@@ -122,6 +122,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    /**{@inheritDoc}*/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -199,6 +200,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         outState.putInt(ConstantManager.EDIT_MODE_KEY, mCurrentEditMode);
     }
 
+    /**
+     *
+     * @param message - текст, отображаемый на SnackBar
+     */
     public void showSnackbar(String message) {
         Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG).show();
     }
@@ -257,6 +262,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
+    /**
+     *  Draws an DrawerHeader
+     * @param parent
+     * @param avatar - icon of NavigationView parent which maked circular here
+     * @param name - name of user, that will be shown in head
+     * @param email - email of user, that will be shown in head
+     */
     private void setupDrawerHeader(NavigationView parent, Bitmap avatar, String name, String email) {
         View view = parent.getHeaderView(0);
         if (avatar != null) {
@@ -410,6 +422,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         else mProfilePlaceholder.setVisibility(View.GONE);
     }
 
+    /**
+     * Maked ToolBar locked and whole sized
+     * @param cond
+     */
     private void lockToolbar(boolean cond) {
         if (cond) {
             mAppBarLayout.setExpanded(true, true);
@@ -459,6 +475,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
+    /**
+     * Maked new File image with .jpg and unic  name by date of  great
+     * @return
+     * @throws IOException
+     */
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp;
@@ -469,6 +490,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         return image;
     }
 
+    /**
+     * Insert main profile image from Uri
+     * @param selectedImage
+     */
     private void insertProfileImage(Uri selectedImage) {
         Picasso.with(this)
                 .load(selectedImage)
@@ -483,6 +508,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         startActivityForResult(appSettingsIntent, ConstantManager.PERMISSION_REQUEST_SETTINGS_CODE);
     }
 
+    /**
+     * Start intent from{@link ConstantManager#USER_INTENT_ACTION} with Uri from
+     * {@link #mUserInfoViews} with scheme from {@link ConstantManager#INTENT_SCHEME}
+     * @param numOfAction
+     */
     private void userProfileActions(int numOfAction) {
         Uri uri = null;
         String action = Intent.ACTION_DEFAULT;
@@ -494,6 +524,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         startActivity(someInfoAction);
     }
+
+    /**
+     * Add listeners for childs of user profile content
+     */
     private void setupUserProfileContent(){
 
         for (ImageView userInfoClicker : mUserInfoClickers) {

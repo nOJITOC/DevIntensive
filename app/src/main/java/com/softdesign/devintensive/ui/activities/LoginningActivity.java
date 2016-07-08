@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -17,35 +16,32 @@ import android.widget.Toast;
 
 import com.softdesign.devintensive.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Start activity with loginning form
  */
 public class LoginningActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
-    private EditText  inputEmail, inputPassword;
-    private TextInputLayout  inputLayoutEmail, inputLayoutPassword;
+    @BindView(R.id.input_password)
+    private EditText inputEmail;
+    @BindView(R.id.input_email)
+    private EditText inputPassword;
+    @BindView(R.id.input_layout_password)
+    private TextInputLayout inputLayoutEmail;
+    @BindView(R.id.input_layout_email)
+    private TextInputLayout inputLayoutPassword;
+    @BindView(R.id.btn_signup)
     private Button btnSignUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loginning);
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-
-        inputLayoutEmail = (TextInputLayout) findViewById(R.id.input_layout_email);
-        inputLayoutPassword = (TextInputLayout) findViewById(R.id.input_layout_password);
-
-        inputEmail = (EditText) findViewById(R.id.input_email);
-        inputPassword = (EditText) findViewById(R.id.input_password);
-        btnSignUp = (Button) findViewById(R.id.btn_signup);
-
+        ButterKnife.bind(this);
         inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
         inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
-
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,7 +63,9 @@ public class LoginningActivity extends AppCompatActivity {
             return;
         }
 
-
+/**
+ * Starts {@link MainActivity} with delay
+ */
         Toast.makeText(getApplicationContext(), "Thank You!", Toast.LENGTH_SHORT).show();
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -78,7 +76,6 @@ public class LoginningActivity extends AppCompatActivity {
             }
         }, 400);
     }
-
 
     private boolean validateEmail() {
         String email = inputEmail.getText().toString().trim();
@@ -117,6 +114,9 @@ public class LoginningActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * TextWatcher for Login form
+     */
     private class MyTextWatcher implements TextWatcher {
 
         private View view;

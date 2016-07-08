@@ -6,9 +6,13 @@ import android.text.TextWatcher;
 import android.widget.EditText;
 
 /**
- * Базовый валидатор. Родитель для остальных специализированных валидаторов.
- * Содержит основные методы для проверки текста внутри {@link android.widget.EditText}
- * @author Maruhin Mihail
+ *
+ * <p>Базовый валидатор. Родитель для остальных специализированных валидаторов.</p>
+ * <p>Содержит основные методы для проверки текста внутри {@link #mEditText}.</p>
+ * <p>Выводит сообщение об ошибки в родительский элемент EditText {@link #mTextInputLayout}</p>
+ *<br/>
+ * <p>Известные дети : {@link UrlValidator} ,{@link PhoneValidator} ,{@link EmailValidator}</p>
+ *@author Maruhin Mihail
  */
 public abstract class BaseValidator implements TextWatcher {
     /**Содержит текст для проверки на валидность. */
@@ -19,7 +23,7 @@ public abstract class BaseValidator implements TextWatcher {
     protected String mDefaultValue;
     /**Позиция курсора в поле с текстом */
     int mPositionCursor;
-    /**parent of mEditText with hint and error{@link #mErrorMSG}*/
+    /**parent of mEditText with hint and error {@link #mErrorMSG}*/
     protected final TextInputLayout mTextInputLayout;
     /**Базовый конструктор
      *@param editText поле для проверки на валидность
