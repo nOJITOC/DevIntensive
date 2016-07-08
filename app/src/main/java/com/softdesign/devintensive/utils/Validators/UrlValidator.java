@@ -1,19 +1,30 @@
 package com.softdesign.devintensive.utils.Validators;
 
 import android.text.Editable;
-import android.util.Log;
 import android.widget.EditText;
-
-import com.softdesign.devintensive.utils.ConstantManager;
 
 
 /**
- * Created by Иван on 06.07.2016.
+ * Валидатор для Url
+ * @author Maruhin Mihail
  */
 public class UrlValidator extends BaseValidator{
+    /**
+     * значение текстового поля {@link #mEditText} до изменения, исключая {@link #mDefaultValue}
+     */
     private String mBefore="";
-    public String mAfter="";
+    /**
+     * значение текстового поля {@link #mEditText} после изменения, исключая {@link #mDefaultValue}
+     */
+    private String mAfter="";
 
+    /**
+     * Базовый конструктор
+     *@param editText поле для проверки на валидность
+     *@param defaultValue значение по умолчанию для проверки на валидность или подставления в поле текста,
+     *                    если что-то пошло не так
+     *@param errorMSG сообщение об ошибки
+     */
     public UrlValidator(EditText editText, String defaultValue, String errorMSG) {
         super(editText, defaultValue, errorMSG);
     }
@@ -35,9 +46,6 @@ public class UrlValidator extends BaseValidator{
     @Override
     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         mBefore=mAfter;
-        Log.e(ConstantManager.TAG_PREFIX,i+"  curs  "+ mBefore);
-
-
     }
 
 

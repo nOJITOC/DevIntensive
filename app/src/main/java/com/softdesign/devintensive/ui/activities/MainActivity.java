@@ -473,6 +473,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         Picasso.with(this)
                 .load(selectedImage)
                 .into(mProfileImage);
+        Log.e(ConstantManager.TAG_PREFIX,""+mNavigationDrawer.getWidth() +(int) getResources().getDimension(R.dimen.size_huge_256));
         mDataManager.getPreferencesManager().saveUserPhoto(selectedImage);
     }
 

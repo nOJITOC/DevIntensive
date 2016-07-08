@@ -7,9 +7,7 @@ import com.softdesign.devintensive.R;
 
 import java.util.List;
 
-/**
- * Created by Иван on 07.07.2016.
- */
+
 public class ValidateManager {
 
 

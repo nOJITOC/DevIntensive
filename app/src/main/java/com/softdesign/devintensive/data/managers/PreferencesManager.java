@@ -10,9 +10,7 @@ import com.softdesign.devintensive.utils.DevIntensiveApplication;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Иван on 26.06.2016.
- */
+
 public class PreferencesManager {
     private SharedPreferences mSharedPreferences;
     public static final String[] USER_FIELDS = {ConstantManager.USER_PHONE_KEY,

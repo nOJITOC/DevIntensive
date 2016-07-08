@@ -17,6 +17,9 @@ import android.widget.Toast;
 
 import com.softdesign.devintensive.R;
 
+/**
+ * Start activity with loginning form
+ */
 public class LoginningActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
@@ -52,7 +55,7 @@ public class LoginningActivity extends AppCompatActivity {
     }
 
     /**
-     * Validating form
+     * Validating form with intent to MainActivity.class
      */
     private void submitForm() {
 

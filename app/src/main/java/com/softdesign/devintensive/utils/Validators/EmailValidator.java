@@ -1,10 +1,9 @@
 package com.softdesign.devintensive.utils.Validators;
 
-import android.text.Editable;
 import android.widget.EditText;
 
 /**
- * Created by Иван on 07.07.2016.
+ * Валидатор для почты
  */
 public class EmailValidator extends BaseValidator {
 
@@ -25,8 +24,5 @@ public class EmailValidator extends BaseValidator {
 
     }
 
-    @Override
-    public void afterTextChanged(Editable editable) {
-        super.afterTextChanged(editable);
-    }
+
 }
