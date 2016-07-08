@@ -13,10 +13,7 @@ import com.softdesign.devintensive.utils.ConstantManager;
  * @author Maruhin Mihail
  */
 public class PhoneValidator extends BaseValidator {
-    /**
-     * значение текстового поля {@link #mEditText} до изменения, исключая {@link #mDefaultValue}
-     */
-    private String mBefore = "";
+
 
     /**
      * Базовый конструктор
@@ -48,7 +45,6 @@ public class PhoneValidator extends BaseValidator {
 
     @Override
     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        mBefore = charSequence.toString();
         mPositionCursor = i + i2;
     }
 

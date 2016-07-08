@@ -24,16 +24,16 @@ import butterknife.ButterKnife;
  */
 public class LoginningActivity extends AppCompatActivity {
 
-    @BindView(R.id.input_password)
-    private EditText inputEmail;
     @BindView(R.id.input_email)
-    private EditText inputPassword;
-    @BindView(R.id.input_layout_password)
-    private TextInputLayout inputLayoutEmail;
+    EditText inputEmail;
+    @BindView(R.id.input_password)
+    EditText inputPassword;
     @BindView(R.id.input_layout_email)
-    private TextInputLayout inputLayoutPassword;
+    TextInputLayout inputLayoutEmail;
+    @BindView(R.id.input_layout_password)
+    TextInputLayout inputLayoutPassword;
     @BindView(R.id.btn_signup)
-    private Button btnSignUp;
+    Button btnSignUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

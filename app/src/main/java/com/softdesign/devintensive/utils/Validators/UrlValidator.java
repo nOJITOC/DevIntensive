@@ -5,7 +5,9 @@ import android.widget.EditText;
 
 
 /**
- * Валидатор для Url
+ * <p>Валидатор для Url.</p>
+ * <p>Позволяет проверять текст в {@link #mEditText} на соответствие определённым правилам и не даёт изменить его (который
+ * написан в  {@link #mDefaultValue}) в начале {@link #mEditText}</p>
  * @author Maruhin Mihail
  */
 public class UrlValidator extends BaseValidator{

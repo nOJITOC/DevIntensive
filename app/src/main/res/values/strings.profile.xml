@@ -1,11 +1,5 @@
 <resources>
-    <string-array name="user_info">
-        <item name="my_phone">+7 (980) 252 - 80 - 58</item>
-        <item name="e_mail">mmteams91java@gmail.com</item>
-        <item name="vk">vk.com/mmteams91</item>
-        <item name="repository">github.com/nOJITOC/DevIntensive</item>
-        <item name="yourself">Здесь мог бы быть какой-то другой текст</item>
-    </string-array>
+
     <string-array name="default_user_info">
         <item name="my_phone">+7 (980) 252 - 80 - 58</item>
         <item name="e_mail">xxx@xx.xx</item>
@@ -13,13 +7,10 @@
         <item name="repository">github.com/</item>
         <item name="yourself">Описание о себе</item>
     </string-array>
-    <string name="error_phone_num_max">Цифр в номере больше 11</string>
-    <string name="error_phone_num_min">Цифр в номере меньше 11</string>
     <string-array name="validation_error">
         <item name="error_phone">Телефон должен состоять из 11-ти цифр, можно использовать + в начале номера</item>
         <item name="error_email">Введите существующий e-mail(XXX@XX.XX)</item>
         <item name="error_vk">Минимум 3 символа после vk.com/</item>
         <item name="error_github">Минимум 3 символа после github.com/</item>
     </string-array>
-    <string name="error_phone_not_supported_characters">Телефон должен состоять из 11-ти цифр, можно использовать + в начале номера</string>
 </resources>
