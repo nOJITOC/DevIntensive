@@ -19,8 +19,8 @@ public class ValidateManager {
         this.mInfoValidators =new BaseValidator[]{
                 new PhoneValidator(forValidate.get(0),defaultValue[0],validationError[0]),
                 new EmailValidator(forValidate.get(1),defaultValue[1],validationError[1]),
-                new UrlValidator(forValidate.get(2),defaultValue[2],validationError[2]),
-                new UrlValidator(forValidate.get(3),defaultValue[3],validationError[3]),
+                new UrlValidator(forValidate.get(2),defaultValue[2],validationError[2],3),
+                new UrlValidator(forValidate.get(3),defaultValue[3],validationError[3],3),
         };
     }
 

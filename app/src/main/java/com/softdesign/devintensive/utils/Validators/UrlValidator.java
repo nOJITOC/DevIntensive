@@ -19,7 +19,10 @@ public class UrlValidator extends BaseValidator{
      * значение текстового поля {@link #mEditText} после изменения, исключая {@link #mDefaultValue}
      */
     private String mAfter="";
-
+    /**
+     * количество символов после {@link #mDefaultValue}
+     */
+    int mSymbolsAfterDefaultValue=3;
     /**
      * Базовый конструктор
      *@param editText поле для проверки на валидность
@@ -27,21 +30,22 @@ public class UrlValidator extends BaseValidator{
      *                    если что-то пошло не так
      *@param errorMSG сообщение об ошибки
      */
-    public UrlValidator(EditText editText, String defaultValue, String errorMSG) {
+    public UrlValidator(EditText editText, String defaultValue, String errorMSG, int symbolsAfterDefaultValue) {
         super(editText, defaultValue, errorMSG);
     }
 
     @Override
     protected boolean isValid(String target) {
-        return mEditText.length() > mDefaultValue.length() + 2;
+        if(target.indexOf(mDefaultValue)!=0) return false;
+        String pattern = "[a-zA-Z]{1}[\\w_/]{"+(mSymbolsAfterDefaultValue-1)+",}";
+        return target.trim().substring(mDefaultValue.length()).matches(pattern);
     }
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         if(charSequence.toString().contains(mDefaultValue)) mAfter =charSequence.toString().substring(charSequence.toString()
-                .indexOf(mDefaultValue)+mDefaultValue.length());
-        if(i<mDefaultValue.length())mPositionCursor=mDefaultValue.length();
-        else mPositionCursor=i+i1;
+                .indexOf(mDefaultValue)+mDefaultValue.length()).trim();
+        mPositionCursor=i+i1;
 
     }
 
@@ -65,7 +69,7 @@ public class UrlValidator extends BaseValidator{
             }catch(Exception e){
 
                 editable.clear();
-                editable.append(mDefaultValue + mBefore);
+                editable.append(mDefaultValue+mBefore);
 
             }
         }

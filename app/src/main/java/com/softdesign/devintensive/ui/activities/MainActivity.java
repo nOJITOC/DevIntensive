@@ -497,6 +497,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void insertProfileImage(Uri selectedImage) {
         Picasso.with(this)
                 .load(selectedImage)
+//                .resize(720,512)
+//                .fit()
                 .into(mProfileImage);
         Log.e(ConstantManager.TAG_PREFIX,""+mNavigationDrawer.getWidth() +(int) getResources().getDimension(R.dimen.size_huge_256));
         mDataManager.getPreferencesManager().saveUserPhoto(selectedImage);

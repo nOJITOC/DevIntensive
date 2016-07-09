@@ -32,7 +32,7 @@ public class PreferencesManager {
     }
     public List<String> loadUserProfileData() {
         List<String> userFields = new ArrayList<>();
-        String[] defaultUsersFields=DevIntensiveApplication.getContext().getResources().getStringArray(R.array.user_info);
+        String[] defaultUsersFields=DevIntensiveApplication.getContext().getResources().getStringArray(R.array.default_user_info);
         for (int i = 0; i < USER_FIELDS.length; i++) {
             userFields.add(mSharedPreferences.getString(USER_FIELDS[i],defaultUsersFields[i]));
         }
