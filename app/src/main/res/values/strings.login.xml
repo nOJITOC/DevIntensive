@@ -12,5 +12,7 @@
     <string name="password">123456</string>
     <string name="login_title_text">ВОЙТИ</string>
     <string name="get_password">Забыли пароль?</string>
+    <string name="ff_medium">sans-serif-medium</string>
+    <string name="ff_regular">sans-serif</string>
 
 </resources>

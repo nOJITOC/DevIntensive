@@ -78,6 +78,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     FloatingActionButton mFab;
     @BindViews({R.id.phone_et, R.id.email_et, R.id.vk_et, R.id.github_et, R.id.bio_et})
     List<EditText> mUserInfoViews;
+    @BindViews({R.id.dev_rating,R.id.dev_code_lines,R.id.dev_projects})
+    List<TextView> mUserStatisticViews;
     @BindViews({R.id.for_phone_call, R.id.for_mail_send, R.id.for_vk_open, R.id.for_github_open})
     List<ImageView> mUserInfoClickers;
     @BindView(R.id.profile_placeholder)
@@ -109,7 +111,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         Log.d(TAG, "onCreate");
         setupToolbar();
         setupDrawer();
-        loadUserInfoValue();
+        initUserFields();
+        initUserInfoValue();
+
         Picasso.with(this)
                 .load(mDataManager.getPreferencesManager().loadUserPhoto())
                 .placeholder(R.drawable.nav_head_bg)
@@ -147,7 +151,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "onPause");
-        saveUserInfoValue();
+        saveUserFields();
 
 
     }
@@ -321,7 +325,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 userValue.setEnabled(false);
                 userValue.setFocusable(false);
                 userValue.setFocusableInTouchMode(false);
-                saveUserInfoValue();
+                saveUserFields();
             }
             showProfilePlaceholder(false);
 //            lockToolbar(false);
@@ -330,19 +334,26 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    private void loadUserInfoValue() {
+    private void initUserFields() {
         List<String> userData = mDataManager.getPreferencesManager().loadUserProfileData();
         for (int i = 0; i < userData.size(); i++) {
             mUserInfoViews.get(i).setText(userData.get(i));
         }
     }
 
-    private void saveUserInfoValue() {
+    private void saveUserFields() {
         List<String> userData = new ArrayList<>();
         for (EditText userInfoView : mUserInfoViews) {
             userData.add(userInfoView.getText().toString());
         }
         mDataManager.getPreferencesManager().saveUserProfileData(userData);
+    }
+
+    private void initUserInfoValue(){
+        List<String> userData = mDataManager.getPreferencesManager().loadUserProfileValue();
+        for (int i = 0; i < userData.size(); i++) {
+            mUserStatisticViews.get(i).setText(userData.get(i));
+        }
     }
 
     private void loadPhotoFromGallery() {

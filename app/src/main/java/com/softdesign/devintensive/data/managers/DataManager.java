@@ -1,16 +1,29 @@
 package com.softdesign.devintensive.data.managers;
 
+import android.content.Context;
+
+import com.softdesign.devintensive.data.network.RestService;
+import com.softdesign.devintensive.data.network.ServiceGenerator;
+import com.softdesign.devintensive.data.network.req.UserLoginReq;
+import com.softdesign.devintensive.data.network.res.UserModelRes;
+import com.softdesign.devintensive.utils.DevIntensiveApplication;
+
+import retrofit2.Call;
+
 /**
  * Class-Singleton  for {@link PreferencesManager}
  */
 public class DataManager {
 
     private static DataManager INSTANCE =null;
-
+    private Context mContext;
     private PreferencesManager mPreferencesManager;
+    private RestService mRestService;
 
     public DataManager() {
         this.mPreferencesManager=new PreferencesManager();
+        this.mContext = DevIntensiveApplication.getContext();
+        this.mRestService = ServiceGenerator.createService(RestService.class);
     }
 
     public PreferencesManager getPreferencesManager() {
@@ -24,4 +37,14 @@ public class DataManager {
         return INSTANCE;
 
     }
+    public Context getContex(){
+        return mContext;
+    }
+    //region =========Network===========
+    public Call<UserModelRes> loginUser(UserLoginReq userLoginReq){
+        return mRestService.loginUser(userLoginReq);
+    }
+    //endregion
+    //============================Database===============
+
 }
