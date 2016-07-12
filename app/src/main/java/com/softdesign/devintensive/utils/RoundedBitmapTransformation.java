@@ -25,12 +25,13 @@ public class RoundedBitmapTransformation implements com.squareup.picasso.Transfo
         final Paint paint = new Paint();
         final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         final RectF rectF = new RectF(rect);
-        final float roundPx = bitmap.getHeight()/2;
+        final float roundPx = bitmap.getWidth()/2;
 
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(color);
         canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawCircle(roundPx,roundPx,roundPx,paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
         bitmap.recycle();

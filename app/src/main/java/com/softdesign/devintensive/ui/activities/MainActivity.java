@@ -36,6 +36,7 @@ import android.widget.TextView;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.RoundedBitmapTransformation;
 import com.softdesign.devintensive.utils.Validators.ValidateManager;
 import com.squareup.picasso.Picasso;
 
@@ -113,6 +114,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         Picasso.with(this)
                 .load(mDataManager.getPreferencesManager().loadUserPhoto())
                 .placeholder(R.drawable.nav_head_bg)
+                .error(R.drawable.nav_head_bg)
                 .into(mProfileImage);
         if (savedInstanceState == null) {
 
@@ -268,12 +270,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * @param email - email of user, that will be shown in head
      */
     private void setupDrawerHeader(NavigationView parent, String name, String email) {
-        ImageView view = (ImageView)parent.getChildAt(0);
+        View view = parent.getHeaderView(0);
+            ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
         Picasso.with(this)
                 .load(mDataManager.getPreferencesManager().loadAvatarPhoto())
-//                .transform(new RoundedBitmapTransformation())
+                .transform(new RoundedBitmapTransformation())
                 .placeholder(R.drawable.ava)
-                .into(view);
+                .into(imageView);
 
 
         if (name != null) {

@@ -93,11 +93,15 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         mDataManager.getPreferencesManager().saveAuthToken(userModel.getData().getToken());
         mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUser().getId());
         UserDataResHelper resHelper = new UserDataResHelper(userModel);
+        try{
         resHelper.saveUserValues();
         resHelper.saveUserFields();
         resHelper.saveUserFio();
         resHelper.saveUserPhoto();
-        resHelper.saveUserAvatar();
+        resHelper.saveUserAvatar();}
+        catch (Exception e){
+
+        }
         Intent toMainActivity = new Intent(AuthActivity.this, MainActivity.class);
         startActivity(toMainActivity);
     }
