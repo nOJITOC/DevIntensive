@@ -27,6 +27,7 @@ public class PreferencesManager {
             ConstantManager.USER_CODE_LINES_VALUE,
             ConstantManager.USER_PROJECT_VALUE,
     };
+
     public PreferencesManager() {
         this.mSharedPreferences = DevIntensiveApplication.getSharedPreferences();
     }
@@ -38,46 +39,64 @@ public class PreferencesManager {
         }
         editor.apply();
     }
+
     public List<String> loadUserProfileData() {
         List<String> userFields = new ArrayList<>();
-        String[] defaultUsersFields=DevIntensiveApplication.getContext().getResources().getStringArray(R.array.default_user_info);
+        String[] defaultUsersFields = DevIntensiveApplication.getContext().getResources().getStringArray(R.array.default_user_info);
         for (int i = 0; i < USER_FIELDS.length; i++) {
-            userFields.add(mSharedPreferences.getString(USER_FIELDS[i],defaultUsersFields[i]));
+            userFields.add(mSharedPreferences.getString(USER_FIELDS[i], defaultUsersFields[i]));
         }
         return userFields;
     }
-    public void saveUserPhoto(Uri uri){
-        SharedPreferences.Editor editor=mSharedPreferences.edit();
-        editor.putString(ConstantManager.USER_PHOTO_KEY,uri.toString());
+
+    public void saveUserPhoto(Uri uri) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.USER_PHOTO_KEY, uri.toString());
         editor.apply();
     }
-    public Uri loadUserPhoto(){
-        return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_KEY,"android.resource://com.softdesign.devintensive/drawable/prof"));
+
+    public Uri loadUserPhoto() {
+        return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_PHOTO_KEY, "android.resource://com.softdesign.devintensive/drawable/prof"));
+    }
+
+    public void saveAvatarPhoto(Uri uri) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.USER_AVATAR_KEY, uri.toString());
+        editor.apply();
+    }
+
+    public Uri loadAvatarPhoto() {
+        return Uri.parse(mSharedPreferences.getString(ConstantManager.USER_AVATAR_KEY, "android.resource://com.softdesign.devintensive/drawable/ava"));
     }
     public void saveAuthToken(String authToken) {
-        SharedPreferences.Editor editor =mSharedPreferences.edit();
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(ConstantManager.AUTH_TOKEN_KEY, authToken);
         editor.apply();
     }
-    public String getAuthToken(){
-        return mSharedPreferences.getString(ConstantManager.AUTH_TOKEN_KEY,"null");
+
+    public String getAuthToken() {
+        return mSharedPreferences.getString(ConstantManager.AUTH_TOKEN_KEY, "null");
     }
-    public void saveUserId(String userId){
-        SharedPreferences.Editor editor =mSharedPreferences.edit();
+
+    public void saveUserId(String userId) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(ConstantManager.USER_ID_KEY, userId);
         editor.apply();
     }
-    public String getUserId(){
-        return mSharedPreferences.getString(ConstantManager.USER_ID_KEY,"null");
+
+    public String getUserId() {
+        return mSharedPreferences.getString(ConstantManager.USER_ID_KEY, "null");
     }
-    public List<String> loadUserProfileValue(){
+
+    public List<String> loadUserProfileValue() {
         List<String> userValues = new ArrayList<>();
         for (int i = 0; i < USER_VALUES.length; i++) {
-            userValues.add(mSharedPreferences.getString(USER_VALUES[i],"0"));
+            userValues.add(mSharedPreferences.getString(USER_VALUES[i], "0"));
         }
         return userValues;
     }
-    public void saveUserProfileValue(int[] userValues){
+
+    public void saveUserProfileValue(int[] userValues) {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         for (int i = 0; i < USER_VALUES.length; i++) {
             editor.putString(USER_VALUES[i], String.valueOf(userValues[i]));
@@ -85,4 +104,26 @@ public class PreferencesManager {
 
         editor.apply();
     }
+
+    public void saveUserFio(String fio) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.USER_FIO_KEY, fio);
+
+    }
+
+    public String getUserFio() {
+        return mSharedPreferences.getString(
+                ConstantManager.USER_FIO_KEY,
+                DevIntensiveApplication.getContext().getResources().getString(R.string.user_fio)
+        );
+    }
+
+    public String getEmail() {
+        return mSharedPreferences.getString(
+                ConstantManager.USER_MAIL_KEY,
+                DevIntensiveApplication.getContext().getResources().getString(R.string.e_mail)
+        );
+    }
+
 }
+

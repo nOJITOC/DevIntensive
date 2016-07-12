@@ -22,6 +22,7 @@ import com.softdesign.devintensive.data.network.req.UserLoginReq;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
+import com.softdesign.devintensive.utils.UserDataResHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -91,7 +92,12 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         showSnackBar(userModel.getData().getToken());
         mDataManager.getPreferencesManager().saveAuthToken(userModel.getData().getToken());
         mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUser().getId());
-        saveUserValues(userModel);
+        UserDataResHelper resHelper = new UserDataResHelper(userModel);
+        resHelper.saveUserValues();
+        resHelper.saveUserFields();
+        resHelper.saveUserFio();
+        resHelper.saveUserPhoto();
+        resHelper.saveUserAvatar();
         Intent toMainActivity = new Intent(AuthActivity.this, MainActivity.class);
         startActivity(toMainActivity);
     }
@@ -125,14 +131,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    private void saveUserValues(UserModelRes userModel){
-        int[] userValues = {
-                userModel.getData().getUser().getProfileValues().getRating(),
-                userModel.getData().getUser().getProfileValues().getLinesCode(),
-                userModel.getData().getUser().getProfileValues().getProjects()
-        };
-        mDataManager.getPreferencesManager().saveUserProfileValue(userValues);
-    }
 
     private boolean validateEmail() {
         String email = mInputEmail.getText().toString().trim();

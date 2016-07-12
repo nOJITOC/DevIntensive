@@ -23,10 +23,29 @@ public class UserModelRes {
 
     public class Contacts {
 
+        public String getVk() {
+            return vk;
+        }
+
         @SerializedName("vk")
         @Expose
+
         private String vk;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public String getPhone() {
+            return phone;
+        }
+
+        public String getUpdated() {
+            return updated;
+        }
+
         @SerializedName("phone")
+
         @Expose
         private String phone;
         @SerializedName("email")
@@ -88,10 +107,23 @@ public class UserModelRes {
 
     }
 
-    public class privateInfo {
+    public class PublicInfo {
+
+        public String getBio() {
+            return bio;
+        }
+
+        public String getPhoto() {
+            return photo;
+        }
+
+        public String getAvatar() {
+            return avatar;
+        }
 
         @SerializedName("bio")
         @Expose
+
         private String bio;
         @SerializedName("avatar")
         @Expose
@@ -106,6 +138,9 @@ public class UserModelRes {
     }
 
     public class Repo {
+        public String getGit() {
+            return git;
+        }
 
         @SerializedName("_id")
         @Expose
@@ -121,8 +156,13 @@ public class UserModelRes {
 
     public class Repositories {
 
+        public List<Repo> getRepo() {
+            return repo;
+        }
+
         @SerializedName("repo")
         @Expose
+
         private List<Repo> repo = new ArrayList<Repo>();
         @SerializedName("updated")
         @Expose
@@ -132,8 +172,10 @@ public class UserModelRes {
 
     public class User {
 
+
         @SerializedName("_id")
         @Expose
+
         private String id;
         @SerializedName("first_name")
         @Expose
@@ -153,9 +195,9 @@ public class UserModelRes {
         @SerializedName("profileValues")
         @Expose
         private ProfileValues profileValues;
-        @SerializedName("privateInfo")
+        @SerializedName("publicInfo")
         @Expose
-        private privateInfo privateInfo;
+        private PublicInfo publicInfo;
         @SerializedName("specialization")
         @Expose
         private String specialization;
@@ -168,6 +210,26 @@ public class UserModelRes {
 
         public String getId() {
             return id;
+        }
+
+        public Contacts getContacts() {
+            return contacts;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public PublicInfo getPublicInfo() {
+            return publicInfo;
+        }
+
+        public Repositories getRepositories() {
+            return repositories;
+        }
+
+        public String getSecondName() {
+            return secondName;
         }
 
         public ProfileValues getProfileValues() {

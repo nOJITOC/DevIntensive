@@ -5,8 +5,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,8 +20,6 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -251,8 +247,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void setupDrawer() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        setupDrawerHeader(navigationView, BitmapFactory.decodeResource(getResources(),
-                R.drawable.ava), getString(R.string.user_fio), getString(R.string.e_mail));
+        setupDrawerHeader(navigationView, mDataManager.getPreferencesManager().getUserFio(), mDataManager.getPreferencesManager().getEmail());
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -269,18 +264,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     /**
      *  Draws an DrawerHeader
      * @param parent
-     * @param avatar - icon of NavigationView parent which maked circular here
      * @param name - name of user, that will be shown in head
      * @param email - email of user, that will be shown in head
      */
-    private void setupDrawerHeader(NavigationView parent, Bitmap avatar, String name, String email) {
-        View view = parent.getHeaderView(0);
-        if (avatar != null) {
-            RoundedBitmapDrawable dr = RoundedBitmapDrawableFactory.create(getResources(), avatar);
-            dr.setCircular(true);
-            ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
-            imageView.setImageDrawable(dr);
-        }
+    private void setupDrawerHeader(NavigationView parent, String name, String email) {
+        ImageView view = (ImageView)parent.getChildAt(0);
+        Picasso.with(this)
+                .load(mDataManager.getPreferencesManager().loadAvatarPhoto())
+//                .transform(new RoundedBitmapTransformation())
+                .placeholder(R.drawable.ava)
+                .into(view);
+
+
         if (name != null) {
             TextView textView = (TextView) view.findViewById(R.id.user_name_txt);
             textView.setText(name);
