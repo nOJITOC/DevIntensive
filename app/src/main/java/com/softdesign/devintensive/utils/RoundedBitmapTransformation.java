@@ -30,7 +30,6 @@ public class RoundedBitmapTransformation implements com.squareup.picasso.Transfo
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(color);
-        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
         canvas.drawCircle(roundPx,roundPx,roundPx,paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);

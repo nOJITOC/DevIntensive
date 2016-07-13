@@ -312,7 +312,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             }
             mUserInfoViews.get(0).requestFocus();
-
+            for (int i = 0; i < mUserInfoViews.size()-1; i++) {
+                mUserInfoViews.get(i).addTextChangedListener(mValidateManager.getValidator(i));
+            }
             showProfilePlaceholder(true);
 //            lockToolbar(true);
             mCollapsingToolbar.setExpandedTitleColor(Color.TRANSPARENT);
@@ -324,6 +326,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 userValue.setFocusable(false);
                 userValue.setFocusableInTouchMode(false);
                 saveUserFields();
+            }
+            mUserInfoViews.get(0).requestFocus();
+            for (int i = 0; i < mUserInfoViews.size()-1; i++) {
+                mUserInfoViews.get(i).removeTextChangedListener(mValidateManager.getValidator(i));
             }
             showProfilePlaceholder(false);
 //            lockToolbar(false);
@@ -549,9 +555,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     userProfileActions(choice);
                 }
             });
-        }
-        for (int i = 0; i < mUserInfoViews.size()-1; i++) {
-            mUserInfoViews.get(i).addTextChangedListener(mValidateManager.getValidator(i));
         }
     }
 }

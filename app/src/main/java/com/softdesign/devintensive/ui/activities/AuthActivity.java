@@ -19,10 +19,12 @@ import android.widget.TextView;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
+import com.softdesign.devintensive.data.network.res.User;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
+import com.softdesign.devintensive.data.network.res.UserRes;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
-import com.softdesign.devintensive.utils.UserDataResHelper;
+import com.softdesign.devintensive.utils.UserInfoUpdateHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,15 +56,47 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mDataManager = DataManager.getInstance();
+        if(mDataManager.getPreferencesManager().getAuthToken()!=null){
+            authByToken();
+        }
         setContentView(R.layout.activity_loginning);
 
-        mDataManager = DataManager.getInstance();
-        toMainActivity();/// TODO: 13.07.2016  
+
         ButterKnife.bind(this);
         mInputEmail.addTextChangedListener(new MyTextWatcher(mInputEmail));
         mInputPassword.addTextChangedListener(new MyTextWatcher(mInputPassword));
         mRememberPswd.setOnClickListener(this);
         mBtnSignUp.setOnClickListener(this);
+    }
+
+    private void authByToken() {
+        if (NetworkStatusChecker.isNetworkAvailable(this)) {
+            Call<UserRes> call = mDataManager.loginToken(mDataManager.getPreferencesManager().getUserId());
+
+            call.enqueue(new Callback<UserRes>() {
+                @Override
+                public void onResponse(Call<UserRes> call, Response<UserRes> response) {
+                    Log.e(ConstantManager.TAG_PREFIX, "" + response.code());
+                    if (response.code() == 200) {
+                        loginSuccess(response.body().getData());
+
+                    } else if (response.code() == 404) {
+                        showSnackBar("Неверный логин или пароль");
+                    } else {
+                        showSnackBar("Всё пропало Шеф!!!");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserRes> call, Throwable t) {
+                    //TODO 11.07.2016 обработать ошибки
+                }
+            });
+        } else {
+            showSnackBar("Сеть на данный момент не доступна, загружаем предыдущие данные");
+            toMainActivity();
+        }
     }
 
     @Override
@@ -87,12 +121,9 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         startActivity(rememberIntent);
     }
 
-    private void loginSuccess(UserModelRes userModel) {
+    private void loginSuccess(User user) {
 
-        showSnackBar(userModel.getData().getToken());
-        mDataManager.getPreferencesManager().saveAuthToken(userModel.getData().getToken());
-        mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUser().getId());
-        UserDataResHelper resHelper = new UserDataResHelper(userModel);
+        UserInfoUpdateHelper resHelper = new UserInfoUpdateHelper(user);
         try{
         resHelper.saveUserValues();
         resHelper.saveUserFields();
@@ -102,6 +133,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         catch (Exception e){
 
         }
+        toMainActivity();
         
     }
 
@@ -119,7 +151,11 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                 public void onResponse(Call<UserModelRes> call, Response<UserModelRes> response) {
                     Log.e(ConstantManager.TAG_PREFIX, "" + response.code());
                     if (response.code() == 200) {
-                        loginSuccess(response.body());
+                        UserModelRes userModel =response.body();
+                        showSnackBar(userModel.getData().getToken());
+                        mDataManager.getPreferencesManager().saveAuthToken(userModel.getData().getToken());
+                        mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUser().getId());
+                        loginSuccess(userModel.getData().getUser());
 
                     } else if (response.code() == 404) {
                         showSnackBar("Неверный логин или пароль");
@@ -134,7 +170,8 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                 }
             });
         } else {
-            showSnackBar("Сеть на данный момент не доступна, попробуйте позже");
+            showSnackBar("Сеть на данный момент не доступна, загружаем предыдущие данные");
+            toMainActivity();
         }
     }
 

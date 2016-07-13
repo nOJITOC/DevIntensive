@@ -6,6 +6,7 @@ import com.softdesign.devintensive.data.network.RestService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
+import com.softdesign.devintensive.data.network.res.UserRes;
 import com.softdesign.devintensive.utils.DevIntensiveApplication;
 
 import retrofit2.Call;
@@ -43,6 +44,9 @@ public class DataManager {
     //region =========Network===========
     public Call<UserModelRes> loginUser(UserLoginReq userLoginReq){
         return mRestService.loginUser(userLoginReq);
+    }
+    public Call<UserRes> loginToken(String userId){
+        return mRestService.loginToken(userId);
     }
     //endregion
     //============================Database===============
