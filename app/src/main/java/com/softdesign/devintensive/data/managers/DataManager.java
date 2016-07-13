@@ -9,6 +9,8 @@ import com.softdesign.devintensive.data.network.res.UserModelRes;
 import com.softdesign.devintensive.data.network.res.UserRes;
 import com.softdesign.devintensive.utils.DevIntensiveApplication;
 
+import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 
 /**
@@ -47,6 +49,13 @@ public class DataManager {
     }
     public Call<UserRes> loginToken(String userId){
         return mRestService.loginToken(userId);
+    }
+    public Call<ResponseBody> photoToServer(String userId, MultipartBody.Part file){
+        return mRestService.photoToServer(userId, file);
+    }
+
+    public RestService getRestService() {
+        return mRestService;
     }
     //endregion
     //============================Database===============

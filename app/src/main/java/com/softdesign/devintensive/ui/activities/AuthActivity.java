@@ -6,12 +6,8 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -64,8 +60,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
 
 
         ButterKnife.bind(this);
-        mInputEmail.addTextChangedListener(new MyTextWatcher(mInputEmail));
-        mInputPassword.addTextChangedListener(new MyTextWatcher(mInputPassword));
         mRememberPswd.setOnClickListener(this);
         mBtnSignUp.setOnClickListener(this);
     }
@@ -95,7 +89,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
             });
         } else {
             showSnackBar("Сеть на данный момент не доступна, загружаем предыдущие данные");
-            toMainActivity();
         }
     }
 
@@ -176,71 +169,5 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     }
 
 
-    private boolean validateEmail() {
-        String email = mInputEmail.getText().toString().trim();
 
-        if (email.isEmpty() || !isValidEmail(email)) {
-            mInputLayoutEmail.setError(getString(R.string.err_msg_email));
-            requestFocus(mInputEmail);
-            return false;
-        } else {
-            mInputLayoutEmail.setErrorEnabled(false);
-        }
-
-        return true;
-    }
-
-    private boolean validatePassword() {
-        if (mInputPassword.getText().toString().trim().isEmpty()) {
-            mInputLayoutPassword.setError(getString(R.string.err_msg_password));
-            requestFocus(mInputPassword);
-            return false;
-        } else {
-            mInputLayoutPassword.setErrorEnabled(false);
-        }
-
-        return true;
-    }
-
-    private static boolean isValidEmail(String email) {
-        return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
-
-    }
-
-    private void requestFocus(View view) {
-        if (view.requestFocus()) {
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
-    }
-
-
-    /**
-     * TextWatcher for Login form
-     */
-    private class MyTextWatcher implements TextWatcher {
-
-        private View view;
-
-        private MyTextWatcher(View view) {
-            this.view = view;
-        }
-
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        }
-
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        }
-
-        public void afterTextChanged(Editable editable) {
-            switch (view.getId()) {
-
-                case R.id.input_email:
-                    validateEmail();
-                    break;
-                case R.id.input_password:
-                    validatePassword();
-                    break;
-            }
-        }
-    }
 }

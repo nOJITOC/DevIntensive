@@ -31,4 +31,5 @@ public class UIHelper {
     public static float currentFriction(int start,int end,int currentValue){
         return (float)(currentValue-start)/(end-start);
     }
+
 }

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,9 +36,12 @@ import android.widget.TextView;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
+import com.softdesign.devintensive.data.network.RestService;
+import com.softdesign.devintensive.data.network.ServiceGenerator;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.RoundedBitmapTransformation;
 import com.softdesign.devintensive.utils.Validators.ValidateManager;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -50,6 +54,13 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
@@ -60,11 +71,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * Manager of Validators {@link com.softdesign.devintensive.utils.Validators.BaseValidator} for profile info
      */
     private ValidateManager mValidateManager;
-    /**Manager for user profile data */
+    /**
+     * Manager for user profile data
+     */
     private DataManager mDataManager;
     @BindView(R.id.call_img)
     ImageView mCallImg;
-    /**Base layout of MainActivity*/
+    /**
+     * Base layout of MainActivity
+     */
     @BindView(R.id.main_coordinator_container)
     CoordinatorLayout mCoordinatorLayout;
     @BindView(R.id.toolbar)
@@ -75,7 +90,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     FloatingActionButton mFab;
     @BindViews({R.id.phone_et, R.id.email_et, R.id.vk_et, R.id.github_et, R.id.bio_et})
     List<EditText> mUserInfoViews;
-    @BindViews({R.id.dev_rating,R.id.dev_code_lines,R.id.dev_projects})
+    @BindViews({R.id.dev_rating, R.id.dev_code_lines, R.id.dev_projects})
     List<TextView> mUserStatisticViews;
     @BindViews({R.id.for_phone_call, R.id.for_mail_send, R.id.for_vk_open, R.id.for_github_open})
     List<ImageView> mUserInfoClickers;
@@ -100,7 +115,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mDataManager = DataManager.getInstance();
-        mValidateManager=new ValidateManager(this,mUserInfoViews);
+        mValidateManager = new ValidateManager(this, mUserInfoViews);
         mCallImg.setOnClickListener(this);
         setupUserProfileContent();
         mFab.setOnClickListener(this);
@@ -113,6 +128,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         Picasso.with(this)
                 .load(mDataManager.getPreferencesManager().loadUserPhoto())
+                .memoryPolicy(MemoryPolicy.NO_CACHE)
                 .placeholder(R.drawable.nav_head_bg)
                 .error(R.drawable.nav_head_bg)
                 .into(mProfileImage);
@@ -124,7 +140,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    /**{@inheritDoc}*/
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -203,7 +221,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     /**
-     *
      * @param message - текст, отображаемый на SnackBar
      */
     public void showSnackbar(String message) {
@@ -236,12 +253,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 if (resultCode == RESULT_OK && data != null) {
                     mSelectedImage = data.getData();
                     insertProfileImage(mSelectedImage);
+                    photoToServer(mSelectedImage);
                 }
                 break;
             case ConstantManager.REQUEST_CAMERA_PICTURE:
                 if (resultCode == RESULT_OK && mPhotoFile != null) {
                     mSelectedImage = Uri.fromFile(mPhotoFile);
                     insertProfileImage(mSelectedImage);
+                    Log.e(TAG, "onActivityResult: " + mPhotoFile.getName() );
+                    photoToServer(mSelectedImage);
+
+
                 }
         }
     }
@@ -264,14 +286,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     /**
-     *  Draws an DrawerHeader
+     * Draws an DrawerHeader
+     *
      * @param parent
-     * @param name - name of user, that will be shown in head
-     * @param email - email of user, that will be shown in head
+     * @param name   - name of user, that will be shown in head
+     * @param email  - email of user, that will be shown in head
      */
     private void setupDrawerHeader(NavigationView parent, String name, String email) {
         View view = parent.getHeaderView(0);
-            ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
+        ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
         Picasso.with(this)
                 .load(mDataManager.getPreferencesManager().loadAvatarPhoto())
                 .transform(new RoundedBitmapTransformation())
@@ -304,7 +327,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void changeEditMode(int mode) {
         if (mode == 1) {
             mFab.setImageResource(R.drawable.ic_done_black_24dp);
-//            showSnackbar("Режим редактирования.");
             for (EditText userValue : mUserInfoViews) {
                 userValue.setEnabled(true);
                 userValue.setFocusable(true);
@@ -312,7 +334,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
             }
             mUserInfoViews.get(0).requestFocus();
-            for (int i = 0; i < mUserInfoViews.size()-1; i++) {
+            for (int i = 0; i < mUserInfoViews.size() - 1; i++) {
                 mUserInfoViews.get(i).addTextChangedListener(mValidateManager.getValidator(i));
             }
             showProfilePlaceholder(true);
@@ -320,7 +342,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mCollapsingToolbar.setExpandedTitleColor(Color.TRANSPARENT);
         } else {
             mFab.setImageResource(R.drawable.ic_create_black_24dp);
-//            showSnackbar("Редактирование завершено.");
             for (EditText userValue : mUserInfoViews) {
                 userValue.setEnabled(false);
                 userValue.setFocusable(false);
@@ -328,7 +349,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 saveUserFields();
             }
             mUserInfoViews.get(0).requestFocus();
-            for (int i = 0; i < mUserInfoViews.size()-1; i++) {
+            for (int i = 0; i < mUserInfoViews.size() - 1; i++) {
                 mUserInfoViews.get(i).removeTextChangedListener(mValidateManager.getValidator(i));
             }
             showProfilePlaceholder(false);
@@ -353,7 +374,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mDataManager.getPreferencesManager().saveUserProfileData(userData);
     }
 
-    private void initUserInfoValue(){
+    private void initUserInfoValue() {
         List<String> userData = mDataManager.getPreferencesManager().loadUserProfileValue();
         for (int i = 0; i < userData.size(); i++) {
             mUserStatisticViews.get(i).setText(userData.get(i));
@@ -398,6 +419,53 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
+    private void photoToServer(Uri fileUri) {
+        RestService service =
+                ServiceGenerator.createService(RestService.class);
+
+        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
+        // use the FileUtils to get the actual file by uri
+        File file = null;
+        if (fileUri.getScheme().equals("file")) {
+            file = new File(fileUri.getPath());
+        }
+        if (fileUri.getScheme().equals("content")) {
+            file = new File(getPath(fileUri));
+        }
+        // create RequestBody instance from file
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("photo", file.getName(), requestFile);
+
+        // finally, execute the request
+        Call<ResponseBody> call = service.photoToServer(mDataManager.getPreferencesManager().getUserId(), body);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call,
+                                   Response<ResponseBody> response) {
+                Log.v(ConstantManager.TAG_PREFIX+" Upload", "success"+response.code());
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e(ConstantManager.TAG_PREFIX+" Upload error:", t.getMessage());
+            }
+        });
+    }
+    public String getPath(Uri uri)
+    {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor == null) return null;
+        int column_index =             cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String s=cursor.getString(column_index);
+        cursor.close();
+        return s;
+    }
     /**
      * Callback for the result from requesting permissions. This method
      * is invoked for every call on {@link #requestPermissions(String[], int)}.
@@ -439,6 +507,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     /**
      * Maked ToolBar locked and whole sized
+     *
      * @param cond
      */
     private void lockToolbar(boolean cond) {
@@ -492,6 +561,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     /**
      * Maked new File image with .jpg and unic  name by date of  great
+     *
      * @return
      * @throws IOException
      */
@@ -507,6 +577,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     /**
      * Insert main profile image from Uri
+     *
      * @param selectedImage
      */
     private void insertProfileImage(Uri selectedImage) {
@@ -515,7 +586,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 //                .resize(720,512)
 //                .fit()
                 .into(mProfileImage);
-        Log.e(ConstantManager.TAG_PREFIX,""+mNavigationDrawer.getWidth() +(int) getResources().getDimension(R.dimen.size_huge_256));
+        Log.e(ConstantManager.TAG_PREFIX, "" + mNavigationDrawer.getWidth() + (int) getResources().getDimension(R.dimen.size_huge_256));
         mDataManager.getPreferencesManager().saveUserPhoto(selectedImage);
     }
 
@@ -528,6 +599,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     /**
      * Start intent from{@link ConstantManager#USER_INTENT_ACTION} with Uri from
      * {@link #mUserInfoViews} with scheme from {@link ConstantManager#INTENT_SCHEME}
+     *
      * @param numOfAction
      */
     private void userProfileActions(int numOfAction) {
@@ -545,7 +617,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     /**
      * Add listeners for childs of user profile content
      */
-    private void setupUserProfileContent(){
+    private void setupUserProfileContent() {
 
         for (ImageView userInfoClicker : mUserInfoClickers) {
             userInfoClicker.setOnClickListener(new View.OnClickListener() {
