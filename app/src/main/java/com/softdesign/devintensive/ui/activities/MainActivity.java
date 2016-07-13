@@ -231,7 +231,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setSupportActionBar(mToolbar);
 
         ActionBar actionBar = getSupportActionBar();
-
+        mCollapsingToolbar.setTitle(mDataManager.getPreferencesManager().getUserFio());
         mAppBarParams = (AppBarLayout.LayoutParams) mCollapsingToolbar.getLayoutParams();
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
