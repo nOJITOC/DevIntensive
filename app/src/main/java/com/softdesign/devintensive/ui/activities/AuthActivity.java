@@ -57,7 +57,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         setContentView(R.layout.activity_loginning);
 
         mDataManager = DataManager.getInstance();
-
+        toMainActivity();/// TODO: 13.07.2016  
         ButterKnife.bind(this);
         mInputEmail.addTextChangedListener(new MyTextWatcher(mInputEmail));
         mInputPassword.addTextChangedListener(new MyTextWatcher(mInputPassword));
@@ -102,10 +102,13 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         catch (Exception e){
 
         }
+        
+    }
+
+    private void toMainActivity(){
         Intent toMainActivity = new Intent(AuthActivity.this, MainActivity.class);
         startActivity(toMainActivity);
     }
-
     private void signIn() {
         if (NetworkStatusChecker.isNetworkAvailable(this)) {
             Call<UserModelRes> call = mDataManager.loginUser(new UserLoginReq(

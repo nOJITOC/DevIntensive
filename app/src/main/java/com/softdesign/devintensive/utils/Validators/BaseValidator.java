@@ -64,6 +64,7 @@ public abstract class BaseValidator implements TextWatcher {
         if (!isValid(mEditText.getText().toString())) {
             mTextInputLayout.setErrorEnabled(true);
             setError(mErrorMSG);
-        } else mTextInputLayout.setErrorEnabled(false);
+        } else {
+            setError("");mTextInputLayout.setErrorEnabled(false);}
     }
 }
