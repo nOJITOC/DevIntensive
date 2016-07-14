@@ -106,7 +106,7 @@
                     android:gravity="center">
 
                     <TextView
-                        android:id="@+id/dev_rating"
+                        android:id="@+id/dev_rating_txt"
                         style="@style/inform_text.value"
                         android:text="@string/rating"
 
@@ -135,7 +135,7 @@
                     android:gravity="center">
 
                     <TextView
-                        android:id="@+id/dev_code_lines"
+                        android:id="@+id/dev_code_lines_txt"
                         style="@style/inform_text.value"
                         android:text="@string/num_of_code_str"/>
 
@@ -162,7 +162,7 @@
                     android:gravity="center">
 
                     <TextView
-                        android:id="@+id/dev_projects"
+                        android:id="@+id/dev_projects_txt"
                         style="@style/inform_text.value"
                         android:text="@string/projects"
 

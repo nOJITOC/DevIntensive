@@ -91,7 +91,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     FloatingActionButton mFab;
     @BindViews({R.id.phone_et, R.id.email_et, R.id.vk_et, R.id.github_et, R.id.bio_et})
     List<EditText> mUserInfoViews;
-    @BindViews({R.id.dev_rating, R.id.dev_code_lines, R.id.dev_projects})
+    @BindViews({R.id.dev_rating_txt, R.id.dev_code_lines_txt, R.id.dev_projects_txt})
     List<TextView> mUserStatisticViews;
     @BindViews({R.id.for_phone_call, R.id.for_mail_send, R.id.for_vk_open, R.id.for_github_open})
     List<ImageView> mUserInfoClickers;

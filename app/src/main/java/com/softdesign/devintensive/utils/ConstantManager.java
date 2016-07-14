@@ -19,6 +19,7 @@ public interface ConstantManager {
     String USER_PROJECT_VALUE = "USER_PROJECT_VALUE";
     String USER_FIO_KEY = "USER_FIO_KEY";
     String USER_AVATAR_KEY = "USER_AVATAR_KEY";
+    String PARCELABLE_KEY = "PARCELABLE_KEY";
 
 
 

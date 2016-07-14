@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_coordinator_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar_layout"
+        style="@style/app_bar"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        >
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            style="@style/app_bar"
+            app:contentScrim="@color/gray"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <ImageView
+                android:id="@+id/user_photo_img"
+                style="@style/app_bar"
+                android:fitsSystemWindows="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/user_bg"/>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+
+                android:layout_width="wrap_content"
+                android:layout_height="?attr/actionBarSize"
+                android:titleTextColor="@color/white"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:theme="@style/ToolBarStyle"/>
+
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        style="@style/statistic_layout"
+
+        android:layout_height="@dimen/statistic_size_112"
+        android:gravity="center_vertical"
+        app:behavior_min_height="@dimen/size_medium_56"
+        app:layout_behavior=".ui.behaviors.UserInfoBehavior"
+        >
+
+        <LinearLayout
+            style="@style/inform"
+            android:layout_weight=".25"
+            app:layout_collapseMode="pin"
+
+            >
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/dev_rating_txt"
+                    style="@style/inform_text.value"
+                    android:text="@string/rating"
+
+                    />
+
+                <TextView
+                    style="@style/inform_text.hint"
+                    android:text="@string/description_rating"/>
+            </android.support.design.widget.TextInputLayout>
+
+
+        </LinearLayout>
+
+        <View
+            style="@style/line_vert"/>
+
+
+        <LinearLayout
+            style="@style/inform"
+            android:layout_weight=".50"
+            >
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/dev_code_lines_txt"
+                    style="@style/inform_text.value"
+                    android:text="@string/num_of_code_str"/>
+
+                <TextView
+                    style="@style/inform_text.hint"
+                    android:text="@string/description_num_of_code"/>
+            </android.support.design.widget.TextInputLayout>
+
+
+        </LinearLayout>
+
+
+        <View
+            style="@style/line_vert"/>
+
+        <LinearLayout
+            style="@style/inform"
+            android:layout_weight=".25"
+            >
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/dev_projects_txt"
+                    style="@style/inform_text.value"
+                    android:text="@string/projects"
+
+                    />
+
+                <TextView
+                    style="@style/inform_text.hint"
+                    android:text="@string/description_projects"/>
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <include layout="@layout/static_profile_content"/>
+
+</android.support.design.widget.CoordinatorLayout>
