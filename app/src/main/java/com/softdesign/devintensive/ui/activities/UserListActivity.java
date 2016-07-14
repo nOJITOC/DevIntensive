@@ -3,6 +3,7 @@ package com.softdesign.devintensive.ui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -104,10 +105,26 @@ public class UserListActivity extends AppCompatActivity {
     }
 
     private void setupDrawer() {
-        //// TODO: 14.07.2016 реализовать переход в другую активити при клике по элементу меню
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                showSnackBar(item.getTitle().toString());
+                item.setChecked(true);
+                mNavigationDrawer.closeDrawer(GravityCompat.START);
+                switch (item.getItemId()){
+                    case R.id.user_profile_menu:
+                        Intent toUserList = new Intent(UserListActivity.this, MainActivity.class);
+                        startActivity(toUserList);
+                }
+                return false;
+            }
+        });
+
     }
 
     private void setupToolbar() {
+        mToolbar.setTitle(R.string.teams_title);
         setSupportActionBar(mToolbar);
 
         ActionBar actionBar = getSupportActionBar();

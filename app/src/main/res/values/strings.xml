@@ -22,5 +22,6 @@
     <string name="user_profile.placeholder.image">Изменить фотографию профиля</string>
     <string name="user_profile_chose_message">выберите фото</string>
     <string name="user_fio">Марухин Михаил</string>
+    <string name="teams_title">Команды</string>
 
 </resources>

@@ -280,6 +280,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 showSnackbar(item.getTitle().toString());
                 item.setChecked(true);
                 mNavigationDrawer.closeDrawer(GravityCompat.START);
+                switch (item.getItemId()){
+                    case R.id.team_menu:
+                        Intent toUserList = new Intent(MainActivity.this, UserListActivity.class);
+                        startActivity(toUserList);
+                }
                 return false;
             }
         });
