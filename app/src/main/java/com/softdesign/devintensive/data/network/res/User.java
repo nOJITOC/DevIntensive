@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class User {
 
 
@@ -70,9 +69,14 @@ public class User {
         return secondName;
     }
 
+    public String getFullName() {
+        return firstName + " " + secondName;
+    }
+
     public ProfileValues getProfileValues() {
         return profileValues;
     }
+
     public class Contacts {
 
         public String getVk() {

@@ -2,6 +2,7 @@ package com.softdesign.devintensive.data.network;
 
 
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
+import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
 import com.softdesign.devintensive.data.network.res.UserRes;
 
@@ -27,4 +28,6 @@ public interface RestService {
     @POST("user/{userId}/publicValues/profilePhoto")
     Call<ResponseBody> photoToServer(@Path("userId") String userId,
                                      @Part MultipartBody.Part file);
+    @GET("user/list?orderBy=rating")
+    Call<UserListRes> getuserList();
 }

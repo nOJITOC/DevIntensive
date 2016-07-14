@@ -17,8 +17,8 @@ public class UserInfoUpdateHelper {
 
     private User mUserModelRes;
 
-    public UserInfoUpdateHelper(User userModelRes) {
-        this.mUserModelRes = userModelRes;
+    public UserInfoUpdateHelper(User userRes) {
+        this.mUserModelRes = userRes;
         this.mDataManager = DataManager.getInstance();
     }
 

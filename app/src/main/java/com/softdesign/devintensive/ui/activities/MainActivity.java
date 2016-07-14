@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.RestService;
@@ -455,8 +456,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         });
     }
-    public String getPath(Uri uri)
-    {
+    public String getPath(Uri uri)    {
         String[] projection = { MediaStore.Images.Media.DATA };
         Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
         if (cursor == null) return null;
@@ -581,7 +581,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * @param selectedImage
      */
     private void insertProfileImage(Uri selectedImage) {
-        Picasso.with(this)
+        Glide
+                .with(this)
                 .load(selectedImage)
 //                .resize(720,512)
 //                .fit()
