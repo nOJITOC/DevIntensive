@@ -124,6 +124,14 @@ public class PreferencesManager {
                 DevIntensiveApplication.getContext().getResources().getString(R.string.e_mail)
         );
     }
+    public String getLastUpdateDate(){
+        return mSharedPreferences.getString(ConstantManager.LAST_UPDATE,null);
+    }
+    public void setLastUpdateDate(String date){
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(ConstantManager.LAST_UPDATE, date);
+
+    }
 
 }
 

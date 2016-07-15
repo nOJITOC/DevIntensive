@@ -41,7 +41,13 @@ public class User {
     @SerializedName("role")
     @Expose
     private String role;
+
+    public String getUpdated() {
+        return updated;
+    }
+
     @SerializedName("updated")
+
     @Expose
     private String updated;
 

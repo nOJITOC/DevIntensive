@@ -1,5 +1,6 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import com.softdesign.devintensive.data.network.res.User;
 import com.softdesign.devintensive.data.network.res.UserListRes;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.ui.adapters.UsersAdapter;
+import com.softdesign.devintensive.ui.fragments.RetainedFragment;
 import com.softdesign.devintensive.utils.ConstantManager;
 
 import java.util.ArrayList;
@@ -56,7 +58,7 @@ public class UserListActivity extends BaseActivity implements android.support.v7
     RecyclerView mRecyclerView;
     private DataManager mDataManager;
     private UsersAdapter mUsersAdapter;
-    private ArrayList<UserDTO> mUsers = new ArrayList<>();
+    private RetainedFragment dataFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,14 +68,19 @@ public class UserListActivity extends BaseActivity implements android.support.v7
         ButterKnife.bind(this);
         mDataManager = DataManager.getInstance();
         if (savedInstanceState == null) {
-            Log.w(TAG, "onCreate: " + getIntent().getParcelableArrayListExtra(ConstantManager.PARCELABLE_KEY).size());
-            mUsers = getIntent().getParcelableArrayListExtra(ConstantManager.PARCELABLE_KEY);
         } else {
-            mUsers = savedInstanceState.getParcelableArrayList(ConstantManager.PARCELABLE_KEY);
-            Log.w(TAG, "onCreate Bundle: " + mUsers.size());
         }
 
+        FragmentManager fm = getFragmentManager();
+        dataFragment = (RetainedFragment) fm.findFragmentByTag("users");
+        if (dataFragment == null) {
+            dataFragment = new RetainedFragment();
+            fm.beginTransaction().add(dataFragment, "users").commit();
 
+            dataFragment.setData(initUsers());
+            Log.w(TAG, "onCreate: users size "+ dataFragment.getData().size());
+        }
+        Log.w(TAG, "onCreate: users size not first"+ dataFragment.getData().size());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         setupToolbar();
@@ -99,25 +106,28 @@ public class UserListActivity extends BaseActivity implements android.support.v7
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
-        outState.putParcelableArrayList(ConstantManager.PARCELABLE_KEY, mUsers);
         super.onSaveInstanceState(outState);
     }
 
-    private void initUsers() {
+    private List<UserDTO> initUsers() {
 
         Call<UserListRes> call = mDataManager.getUserList();
+        final List<UserDTO> tempUsers = new ArrayList<>();
         call.enqueue(new Callback<UserListRes>() {
             @Override
             public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
                 try {
                     if (response.code() == 200) {
+
                         List<User> users = response.body().getData();
                         for (User user : users) {
 
-                            mUsers.add(new UserDTO(user));
-                            loadUsers();
+                            tempUsers.add(new UserDTO(user));
 
                         }
+                        Log.w(TAG, "onResponse: "+tempUsers.size() );
+                        dataFragment.setData(tempUsers);
+                        loadUsers();
                     }
                 } catch (NullPointerException e) {
                     Log.e(TAG, e.getMessage());
@@ -129,18 +139,22 @@ public class UserListActivity extends BaseActivity implements android.support.v7
             @Override
             public void onFailure(Call<UserListRes> call, Throwable t) {
 //// TODO: 14.07.2016 обработать ошибок
+                showSnackbar("Что-то случилось...");
+                Log.e(TAG, "onFailure: " + t.getMessage());
+                finish();
             }
         });
-        Log.w(TAG, "initUsers(): " + mUsers.size());
+        Log.w(TAG, "initUsers(): " + tempUsers.size());
+    return tempUsers;
     }
 
     private void loadUsers() {
 
-        mUsersAdapter = new UsersAdapter(mUsers, new UsersAdapter.UserViewHolder.CustomClickListener() {
+        mUsersAdapter = new UsersAdapter(dataFragment.getData(), new UsersAdapter.UserViewHolder.CustomClickListener() {
             @Override
             public void onUserItemClick(int position) {
                 showSnackbar("Пользователь с индексом " + position);
-                UserDTO userDTO = mUsers.get(position);
+                UserDTO userDTO = dataFragment.getData().get(position);
                 Intent profileIntent = new Intent(UserListActivity.this, ProfileUserActivity.class);
                 profileIntent.putExtra(ConstantManager.PARCELABLE_KEY, userDTO);
                 startActivity(profileIntent);
@@ -189,12 +203,14 @@ public class UserListActivity extends BaseActivity implements android.support.v7
 
     }
 
+    @Override
+    protected void onDestroy() {
+        dataFragment.setData(dataFragment.getData());
+        super.onDestroy();
+    }
+
     private void setupToolbar() {
         setSupportActionBar(mToolbar);
-//        mToolbar.inflateMenu(R.menu.toolbar_menu);
-//        MenuItem item = mToolbar.getMenu().findItem(R.id.action_search);
-//        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
-//        searchView.setOnQueryTextListener(this);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -214,6 +230,7 @@ public class UserListActivity extends BaseActivity implements android.support.v7
 
         return true;
     }
+
     @Override
     public boolean onQueryTextSubmit(String query) {
         return false;
@@ -222,7 +239,7 @@ public class UserListActivity extends BaseActivity implements android.support.v7
     @Override
     public boolean onQueryTextChange(String newText) {
         List<UserDTO> users = new ArrayList<>();
-        for (UserDTO user : mUsers) {
+        for (UserDTO user : dataFragment.getData()) {
             if (user.getFullName().toLowerCase().contains(newText.toLowerCase())) {
                 users.add(user);
             }

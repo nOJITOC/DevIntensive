@@ -54,7 +54,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         mDataManager = DataManager.getInstance();
         showProgress();
-        if(mDataManager.getPreferencesManager().getAuthToken()!=null){
+        if (mDataManager.getPreferencesManager().getAuthToken() != null) {
             authByToken();
         }
         setContentView(R.layout.activity_loginning);
@@ -117,24 +117,28 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
 
     private void loginSuccess(User user) {
 
-        UserInfoUpdateHelper resHelper = new UserInfoUpdateHelper(user);
-        try{
-        resHelper.saveUserValues();
-        resHelper.saveUserFields();
-        resHelper.saveUserFio();
-        resHelper.saveUserPhoto();
-        resHelper.saveUserAvatar();}
-        catch (Exception e){
 
+        String nowDate = user.getUpdated();
+        String oldDate = mDataManager.getPreferencesManager().getLastUpdateDate();
+
+        if (!nowDate.equals(oldDate) || oldDate == null) {
+            UserInfoUpdateHelper resHelper = new UserInfoUpdateHelper(user);
+            resHelper.saveUserValues();
+            resHelper.saveUserFields();
+            resHelper.saveUserFio();
+            resHelper.saveUserPhoto();
+            resHelper.saveUserAvatar();
+            mDataManager.getPreferencesManager().setLastUpdateDate(nowDate);
         }
         toMainActivity();
-        
+
     }
 
-    private void toMainActivity(){
+    private void toMainActivity() {
         Intent toMainActivity = new Intent(AuthActivity.this, MainActivity.class);
         startActivity(toMainActivity);
     }
+
     private void signIn() {
         if (NetworkStatusChecker.isNetworkAvailable(this)) {
             Call<UserModelRes> call = mDataManager.loginUser(new UserLoginReq(
@@ -145,7 +149,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                 public void onResponse(Call<UserModelRes> call, Response<UserModelRes> response) {
                     Log.e(ConstantManager.TAG_PREFIX, "" + response.code());
                     if (response.code() == 200) {
-                        UserModelRes userModel =response.body();
+                        UserModelRes userModel = response.body();
                         showSnackBar(userModel.getData().getToken());
                         mDataManager.getPreferencesManager().saveAuthToken(userModel.getData().getToken());
                         mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUser().getId());
@@ -168,7 +172,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
             toMainActivity();
         }
     }
-
 
 
 }
