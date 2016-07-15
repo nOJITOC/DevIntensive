@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.softdesign.devintensive.R;
-import com.softdesign.devintensive.data.network.res.User;
+import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.ui.views.AspectRatioImageView;
 
 import java.util.List;
@@ -19,11 +19,11 @@ import java.util.List;
  * Created by Иван on 14.07.2016.
  */
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder> {
-    List<User> mUsers;
+    List<UserDTO> mUsers;
     Context mContext;
     UserViewHolder.CustomClickListener mCustomClickListener;
 
-    public UsersAdapter(List<User> users, UserViewHolder.CustomClickListener customClickListener) {
+    public UsersAdapter(List<UserDTO> users, UserViewHolder.CustomClickListener customClickListener) {
         this.mUsers = users;
         this.mCustomClickListener = customClickListener;
 
@@ -44,23 +44,21 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
 
     @Override
     public void onBindViewHolder(UserViewHolder holder, int position) {
-// TODO: 14.07.2016 реализовать Bind
-        User user = mUsers.get(position);
+        UserDTO user = mUsers.get(position);
         Glide.with(mContext)
-                .load(user.getPublicInfo().getPhoto())
-                .skipMemoryCache(true)
+                .load(user.getPhoto())
                 .placeholder(mContext.getResources().getDrawable(R.drawable.user_bg))
                 .error(mContext.getResources().getDrawable(R.drawable.user_bg))
                 .into(holder.userPhoto);
         holder.mFullName.setText(user.getFullName());
-        holder.mRating.setText(String.valueOf(user.getProfileValues().getRating()));
-        holder.mCodeLines.setText(String.valueOf(user.getProfileValues().getLinesCode()));
-        holder.mProjects.setText(String.valueOf(user.getProfileValues().getProjects()));
-        if (user.getPublicInfo().getBio() == null || user.getPublicInfo().getBio().isEmpty()) {
+        holder.mRating.setText(String.valueOf(user.getRating()));
+        holder.mCodeLines.setText(String.valueOf(user.getCodeLines()));
+        holder.mProjects.setText(String.valueOf(user.getProjects()));
+        if (user.getBio() == null || user.getBio().isEmpty()) {
             holder.mBio.setVisibility(View.GONE);
         } else {
             holder.mBio.setVisibility(View.VISIBLE);
-            holder.mBio.setText(user.getPublicInfo().getBio());
+            holder.mBio.setText(user.getBio());
         }
 
 

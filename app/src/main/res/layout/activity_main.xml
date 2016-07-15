@@ -186,7 +186,8 @@
             android:layout_marginRight="@dimen/fba_right_space"
             android:src="@drawable/ic_create_black_24dp"
             app:layout_anchor="@id/appbar_layout"
-            app:layout_anchorGravity="right|bottom"/>
+            app:layout_anchorGravity="right|bottom"
+            android:onClick="changeEditMode()"/>
 
     </android.support.design.widget.CoordinatorLayout>
 

@@ -53,11 +53,12 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDataManager = DataManager.getInstance();
+        showProgress();
         if(mDataManager.getPreferencesManager().getAuthToken()!=null){
             authByToken();
         }
         setContentView(R.layout.activity_loginning);
-
+        hideProgress();
 
         ButterKnife.bind(this);
         mRememberPswd.setOnClickListener(this);

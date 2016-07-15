@@ -3,6 +3,7 @@ package com.softdesign.devintensive.ui.activities;
 import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -24,9 +25,16 @@ public class BaseActivity extends AppCompatActivity {
             mProgressDialog.setContentView(R.layout.progress_splash);
     }
     public void hideProgress(){
-        if(mProgressDialog !=null){
-            mProgressDialog.hide();
-        }
+        Handler handler= new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(mProgressDialog !=null){
+                    mProgressDialog.hide();
+                }
+            }
+        }, 500);
+
     }
     public void showError(String message,Exception error){
         showToast(message);

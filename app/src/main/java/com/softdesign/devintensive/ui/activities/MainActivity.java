@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +22,8 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -35,15 +38,16 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.RestService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
+import com.softdesign.devintensive.data.network.res.User;
+import com.softdesign.devintensive.data.network.res.UserListRes;
+import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.utils.ConstantManager;
-import com.softdesign.devintensive.utils.RoundedBitmapTransformation;
 import com.softdesign.devintensive.utils.Validators.ValidateManager;
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -106,18 +110,28 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     Uri mSelectedImage = null;
     @BindView(R.id.user_photo_img)
     ImageView mProfileImage;
+    private ArrayList<UserDTO> mUsers = new ArrayList<>();
 
     @Override
     /**
      * @param savedInstanceState - значения в Bundle - состояние UI
      */
     protected void onCreate(Bundle savedInstanceState) {
+        showProgress();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mDataManager = DataManager.getInstance();
+
         mValidateManager = new ValidateManager(this, mUserInfoViews);
-        mCallImg.setOnClickListener(this);
+        if (savedInstanceState == null) {
+            loadUsers();
+
+        } else {
+            mUsers = savedInstanceState.getParcelableArrayList(ConstantManager.PARCELABLE_KEY);
+            mCurrentEditMode = savedInstanceState.getInt(ConstantManager.EDIT_MODE_KEY, 0);
+            changeEditMode(mCurrentEditMode);
+        }
         setupUserProfileContent();
         mFab.setOnClickListener(this);
         mProfilePlaceholder.setOnClickListener(this);
@@ -126,19 +140,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setupDrawer();
         initUserFields();
         initUserInfoValue();
-
-        Picasso.with(this)
+        Glide.with(MainActivity.this)
                 .load(mDataManager.getPreferencesManager().loadUserPhoto())
-                .memoryPolicy(MemoryPolicy.NO_CACHE)
                 .placeholder(R.drawable.nav_head_bg)
                 .error(R.drawable.nav_head_bg)
                 .into(mProfileImage);
-        if (savedInstanceState == null) {
 
-        } else {
-            mCurrentEditMode = savedInstanceState.getInt(ConstantManager.EDIT_MODE_KEY, 0);
-            changeEditMode(mCurrentEditMode);
-        }
     }
 
     /**
@@ -155,6 +162,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onStart() {
         super.onStart();
+        hideProgress();
         Log.d(TAG, "onStart");
     }
 
@@ -217,6 +225,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(ConstantManager.PARCELABLE_KEY, mUsers);
         Log.d(TAG, "onSaveInstanceState");
         outState.putInt(ConstantManager.EDIT_MODE_KEY, mCurrentEditMode);
     }
@@ -261,7 +270,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 if (resultCode == RESULT_OK && mPhotoFile != null) {
                     mSelectedImage = Uri.fromFile(mPhotoFile);
                     insertProfileImage(mSelectedImage);
-                    Log.e(TAG, "onActivityResult: " + mPhotoFile.getName() );
+                    Log.e(TAG, "onActivityResult: " + mPhotoFile.getName());
                     photoToServer(mSelectedImage);
 
 
@@ -278,17 +287,47 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 showSnackbar(item.getTitle().toString());
-                item.setChecked(true);
                 mNavigationDrawer.closeDrawer(GravityCompat.START);
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.team_menu:
+                        Log.w(TAG, "setupDrawer: " + mUsers.size());
                         Intent toUserList = new Intent(MainActivity.this, UserListActivity.class);
+                        toUserList.putParcelableArrayListExtra(ConstantManager.PARCELABLE_KEY, mUsers);
                         startActivity(toUserList);
                 }
                 return false;
             }
         });
 
+    }
+
+    private void loadUsers() {
+        Log.w(TAG, "loadUsers: ");
+        Call<UserListRes> call = mDataManager.getUserList();
+        call.enqueue(new Callback<UserListRes>() {
+            @Override
+            public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
+                try {
+                    if (response.code() == 200) {
+                        List<User> users = response.body().getData();
+                        for (User user : users) {
+
+                            mUsers.add(new UserDTO(user));
+
+                        }
+                    }
+                } catch (NullPointerException e) {
+                    Log.e(TAG, e.getMessage());
+                    showSnackbar("Что-то пошло не так");
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<UserListRes> call, Throwable t) {
+//// TODO: 14.07.2016 обработать ошибок
+            }
+        });
     }
 
     /**
@@ -300,12 +339,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      */
     private void setupDrawerHeader(NavigationView parent, String name, String email) {
         View view = parent.getHeaderView(0);
-        ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
-        Picasso.with(this)
+        final ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
+        Glide.with(this)
                 .load(mDataManager.getPreferencesManager().loadAvatarPhoto())
-                .transform(new RoundedBitmapTransformation())
+                .asBitmap()
+                .centerCrop()
                 .placeholder(R.drawable.ava)
-                .into(imageView);
+                .into(new BitmapImageViewTarget(imageView) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable =
+                                RoundedBitmapDrawableFactory.create(MainActivity.this.getResources(), resource);
+                        circularBitmapDrawable.setCircular(true);
+                        imageView.setImageDrawable(circularBitmapDrawable);
+                    }
+                });
 
 
         if (name != null) {
@@ -452,25 +500,27 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void onResponse(Call<ResponseBody> call,
                                    Response<ResponseBody> response) {
-                Log.v(ConstantManager.TAG_PREFIX+" Upload", "success"+response.code());
+                Log.v(ConstantManager.TAG_PREFIX + " Upload", "success" + response.code());
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e(ConstantManager.TAG_PREFIX+" Upload error:", t.getMessage());
+                Log.e(ConstantManager.TAG_PREFIX + " Upload error:", t.getMessage());
             }
         });
     }
-    public String getPath(Uri uri)    {
-        String[] projection = { MediaStore.Images.Media.DATA };
+
+    public String getPath(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
         Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
         if (cursor == null) return null;
-        int column_index =             cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
-        String s=cursor.getString(column_index);
+        String s = cursor.getString(column_index);
         cursor.close();
         return s;
     }
+
     /**
      * Callback for the result from requesting permissions. This method
      * is invoked for every call on {@link #requestPermissions(String[], int)}.

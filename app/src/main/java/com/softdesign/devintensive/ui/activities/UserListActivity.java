@@ -1,20 +1,26 @@
 package com.softdesign.devintensive.ui.activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.res.User;
@@ -23,6 +29,7 @@ import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.ui.adapters.UsersAdapter;
 import com.softdesign.devintensive.utils.ConstantManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -31,7 +38,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class UserListActivity extends AppCompatActivity {
+public class UserListActivity extends BaseActivity {
 
     public static final String TAG = ConstantManager.TAG_PREFIX + " User List Activity";
 
@@ -45,18 +52,33 @@ public class UserListActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
     private DataManager mDataManager;
     private UsersAdapter mUsersAdapter;
-    private List<User> mUsers;
+    private ArrayList<UserDTO> mUsers=new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        showProgress();
         setContentView(R.layout.activity_user_list);
         ButterKnife.bind(this);
         mDataManager=DataManager.getInstance();
+        if (savedInstanceState == null) {
+            Log.w(TAG, "onCreate: "+getIntent().getParcelableArrayListExtra(ConstantManager.PARCELABLE_KEY).size());
+            mUsers= getIntent().getParcelableArrayListExtra(ConstantManager.PARCELABLE_KEY);
+        } else {
+            mUsers = savedInstanceState.getParcelableArrayList(ConstantManager.PARCELABLE_KEY);
+            Log.w(TAG, "onCreate Bundle: "+mUsers.size());
+        }
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
+        super.onStart();
         setupToolbar();
         setupDrawer();
         loadUsers();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        hideProgress();
     }
 
     @Override
@@ -68,30 +90,32 @@ public class UserListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadUsers() {
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        outState.putParcelableArrayList(ConstantManager.PARCELABLE_KEY,mUsers);
+        super.onSaveInstanceState(outState);
+    }
+    private void initUsers() {
+
         Call<UserListRes> call = mDataManager.getUserList();
         call.enqueue(new Callback<UserListRes>() {
             @Override
             public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
                 try {
-                    if(response.code()==200){
-                        mUsers = response.body().getData();
-                        mUsersAdapter = new UsersAdapter(mUsers, new UsersAdapter.UserViewHolder.CustomClickListener() {
-                            @Override
-                            public void onUserItemClick(int position) {
-                                showSnackBar("Пользователь с индексом "+ position);
-                                UserDTO userDTO = new UserDTO(mUsers.get(position));
-                                Intent profileIntent = new Intent(UserListActivity.this, ProfileUserActivity.class);
-                                profileIntent.putExtra(ConstantManager.PARCELABLE_KEY,userDTO);
-                                startActivity(profileIntent);
-                            }
-                        });
-                        mRecyclerView.setAdapter(mUsersAdapter);
+                    if (response.code() == 200) {
+                        List<User> users = response.body().getData();
+                        for (User user : users) {
+
+                            mUsers.add(new UserDTO(user));
+
+                        }
                     }
-                }catch (NullPointerException e){
-                    Log.e(TAG,e.getMessage());
-                    showSnackBar("Что-то пошло не так");
+                } catch (NullPointerException e) {
+                    Log.e(TAG, e.getMessage());
+                    showSnackbar("Что-то пошло не так");
                 }
+
             }
 
             @Override
@@ -99,17 +123,49 @@ public class UserListActivity extends AppCompatActivity {
 //// TODO: 14.07.2016 обработать ошибок
             }
         });
+        Log.w(TAG, "initUsers(): "+mUsers.size());
     }
-    private void showSnackBar(String message){
+    private void loadUsers() {
+
+                        mUsersAdapter = new UsersAdapter(mUsers, new UsersAdapter.UserViewHolder.CustomClickListener() {
+                            @Override
+                            public void onUserItemClick(int position) {
+                                showSnackbar("Пользователь с индексом "+ position);
+                                UserDTO userDTO = mUsers.get(position);
+                                Intent profileIntent = new Intent(UserListActivity.this, ProfileUserActivity.class);
+                                profileIntent.putExtra(ConstantManager.PARCELABLE_KEY,userDTO);
+                                startActivity(profileIntent);
+                            }
+                        });
+                        mRecyclerView.setAdapter(mUsersAdapter);
+
+    }
+    private void showSnackbar(String message){
         Snackbar.make(mCoordinatorLayout,message,Snackbar.LENGTH_LONG).show();
     }
 
     private void setupDrawer() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        View view = navigationView.getHeaderView(0);
+        final ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
+        Glide.with(this)
+                .load(mDataManager.getPreferencesManager().loadAvatarPhoto())
+                .asBitmap()
+                .centerCrop()
+                .placeholder(R.drawable.ava)
+                .into(new BitmapImageViewTarget(imageView) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable =
+                                RoundedBitmapDrawableFactory.create(UserListActivity.this.getResources(), resource);
+                        circularBitmapDrawable.setCircular(true);
+                        imageView.setImageDrawable(circularBitmapDrawable);
+                    }
+                });
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
-                showSnackBar(item.getTitle().toString());
+                showSnackbar(item.getTitle().toString());
                 item.setChecked(true);
                 mNavigationDrawer.closeDrawer(GravityCompat.START);
                 switch (item.getItemId()){
@@ -124,12 +180,10 @@ public class UserListActivity extends AppCompatActivity {
     }
 
     private void setupToolbar() {
-        mToolbar.setTitle(R.string.teams_title);
         setSupportActionBar(mToolbar);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
