@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -69,7 +70,9 @@ public class ProfileUserActivity extends AppCompatActivity {
         final List<String> repositories = userDTO.getRepositories();
         final RepositoriesAdapter repositoriesAdapter = new RepositoriesAdapter(this, repositories);
         mRepoListView.setAdapter(repositoriesAdapter);
-
+        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mRepoListView.getLayoutParams();
+        lp.height= (lp.height)*repositories.size();
+        mRepoListView.setLayoutParams(lp);
         mRepoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -91,7 +94,6 @@ public class ProfileUserActivity extends AppCompatActivity {
         mCollapsingToolbar.setTitle(userDTO.getFullName());
         Glide.with(this)
                 .load(userDTO.getPhoto())
-                .skipMemoryCache(true)
                 .placeholder(R.drawable.user_bg)
                 .error(R.drawable.user_bg)
 

@@ -68,22 +68,17 @@
 
                 >
 
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center">
 
-                    <TextView
-                        android:id="@+id/dev_rating_txt"
-                        style="@style/inform_text.value"
-                        android:text="@string/rating"
+                <TextView
+                    android:id="@+id/dev_rating_txt"
+                    style="@style/inform_text.value"
+                    android:text="@string/rating"
 
-                        />
+                    />
 
-                    <TextView
-                        style="@style/inform_text.hint"
-                        android:text="@string/description_rating"/>
-                </android.support.design.widget.TextInputLayout>
+                <TextView
+                    style="@style/inform_text.hint"
+                    android:text="@string/description_rating"/>
 
 
             </LinearLayout>
@@ -97,20 +92,15 @@
                 android:layout_weight=".50"
                 >
 
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center">
 
-                    <TextView
-                        android:id="@+id/dev_code_lines_txt"
-                        style="@style/inform_text.value"
-                        android:text="@string/num_of_code_str"/>
+                <TextView
+                    android:id="@+id/dev_code_lines_txt"
+                    style="@style/inform_text.value"
+                    android:text="@string/num_of_code_str"/>
 
-                    <TextView
-                        style="@style/inform_text.hint"
-                        android:text="@string/description_num_of_code"/>
-                </android.support.design.widget.TextInputLayout>
+                <TextView
+                    style="@style/inform_text.hint"
+                    android:text="@string/description_num_of_code"/>
 
 
             </LinearLayout>
@@ -124,22 +114,18 @@
                 android:layout_weight=".25"
                 >
 
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center">
 
-                    <TextView
-                        android:id="@+id/dev_projects_txt"
-                        style="@style/inform_text.value"
-                        android:text="@string/projects"
+                <TextView
+                    android:id="@+id/dev_projects_txt"
+                    style="@style/inform_text.value"
+                    android:text="@string/projects"
 
-                        />
+                    />
 
-                    <TextView
-                        style="@style/inform_text.hint"
-                        android:text="@string/description_projects"/>
-                </android.support.design.widget.TextInputLayout>
+                <TextView
+                    style="@style/inform_text.hint"
+                    android:text="@string/description_projects"/>
+
             </LinearLayout>
 
 
