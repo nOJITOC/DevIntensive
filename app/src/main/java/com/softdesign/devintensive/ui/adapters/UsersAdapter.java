@@ -13,6 +13,7 @@ import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.storage.models.UserDTO;
 import com.softdesign.devintensive.ui.views.AspectRatioImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,8 +63,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         }
 
 
-    }
 
+    }
+    public void setUsers(List<UserDTO> models) {
+        mUsers = new ArrayList<>(models);
+    }
     public static class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         protected AspectRatioImageView userPhoto;
         protected TextView mFullName, mRating, mCodeLines, mProjects, mBio;

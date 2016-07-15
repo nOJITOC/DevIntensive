@@ -23,5 +23,6 @@
     <string name="user_profile_chose_message">выберите фото</string>
     <string name="user_fio">Марухин Михаил</string>
     <string name="teams_title">Команды</string>
+    <string name="action_search">поиск...</string>
 
 </resources>
