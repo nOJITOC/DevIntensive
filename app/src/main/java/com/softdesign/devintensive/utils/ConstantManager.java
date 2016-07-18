@@ -19,8 +19,8 @@ public interface ConstantManager {
     String USER_PROJECT_VALUE = "USER_PROJECT_VALUE";
     String USER_FIO_KEY = "USER_FIO_KEY";
     String USER_AVATAR_KEY = "USER_AVATAR_KEY";
-
-
+    String PARCELABLE_KEY = "PARCELABLE_KEY";
+    String LAST_UPDATE = "LAST_UPDATE";
 
     String[] USER_INTENT_ACTION = {
             Intent.ACTION_DIAL,
@@ -41,6 +41,4 @@ public interface ConstantManager {
     int PERMISSION_REQUEST_SETTINGS_CODE = 101;
     int CAMERA_REQUEST_PERMISSION_CODE = 102;
     float BEHAVIOR_MULTIPIER = 112.0f / 256f;
-
-
 }

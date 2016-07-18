@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class User {
 
 
@@ -42,7 +41,13 @@ public class User {
     @SerializedName("role")
     @Expose
     private String role;
+
+    public String getUpdated() {
+        return updated;
+    }
+
     @SerializedName("updated")
+
     @Expose
     private String updated;
 
@@ -70,9 +75,14 @@ public class User {
         return secondName;
     }
 
+    public String getFullName() {
+        return firstName + " " + secondName;
+    }
+
     public ProfileValues getProfileValues() {
         return profileValues;
     }
+
     public class Contacts {
 
         public String getVk() {

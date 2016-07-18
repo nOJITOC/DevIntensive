@@ -1,7 +1,7 @@
 <resources>
 
     <string-array name="default_user_info">
-        <item name="my_phone">+7 (980) 252 - 80 - 58</item>
+        <item name="my_phone">+x (xxx) xxx - xx - xx</item>
         <item name="e_mail">xxx@xx.xx</item>
         <item name="vk">vk.com/</item>
         <item name="repository">github.com/</item>

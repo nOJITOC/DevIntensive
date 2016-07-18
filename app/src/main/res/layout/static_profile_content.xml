@@ -1,0 +1,83 @@
+
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:id="@+id/nested_scroll_for_et"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior=".ui.behaviors.CustomNestedScrollBehavior">
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin">
+
+        <LinearLayout
+            style="@style/main_inform">
+
+            <ImageView
+                style="@style/icon.left"
+                android:src="@drawable/github_circle"
+                />
+            <ListView
+                android:id="@+id/repositories_list"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/size_big_72"
+                android:layout_marginLeft="@dimen/spacing_medium_32">
+
+            </ListView>
+
+            <ImageView
+                android:id="@+id/for_github_open"
+                style="@style/icon.right"
+                android:src="@drawable/ic_visibility_black_24dp"
+                />
+        </LinearLayout>
+
+        <View
+            style="@style/line"/>
+
+        <LinearLayout
+            style="@style/main_inform">
+
+            <ImageView
+
+                style="@style/icon.left"
+                android:src="@drawable/account_circle"
+                />
+
+            <LinearLayout
+
+                style="@style/middle_layout">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/bio_et"
+                        style="@style/edit_text"
+                        android:hint="@string/description_yourself"
+                        android:inputType="textMultiLine"
+                        android:text="@string/yourself"
+                        />
+
+                </android.support.design.widget.TextInputLayout>
+
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <View
+            style="@style/line"/>
+
+
+    </LinearLayout>
+
+
+</android.support.v4.widget.NestedScrollView>

@@ -73,7 +73,8 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="?attr/actionBarSize"
-                    android:theme="@style/AppTheme.PopupOverlay"
+                    app:theme="@style/ToolBarStyle"
+                    app:popupTheme="@style/AppTheme.PopupOverlay"
                     android:titleTextColor="@color/white"
                     app:layout_collapseMode="pin"/>
 
@@ -105,7 +106,7 @@
                     android:gravity="center">
 
                     <TextView
-                        android:id="@+id/dev_rating"
+                        android:id="@+id/dev_rating_txt"
                         style="@style/inform_text.value"
                         android:text="@string/rating"
 
@@ -134,7 +135,7 @@
                     android:gravity="center">
 
                     <TextView
-                        android:id="@+id/dev_code_lines"
+                        android:id="@+id/dev_code_lines_txt"
                         style="@style/inform_text.value"
                         android:text="@string/num_of_code_str"/>
 
@@ -161,7 +162,7 @@
                     android:gravity="center">
 
                     <TextView
-                        android:id="@+id/dev_projects"
+                        android:id="@+id/dev_projects_txt"
                         style="@style/inform_text.value"
                         android:text="@string/projects"
 
@@ -185,7 +186,8 @@
             android:layout_marginRight="@dimen/fba_right_space"
             android:src="@drawable/ic_create_black_24dp"
             app:layout_anchor="@id/appbar_layout"
-            app:layout_anchorGravity="right|bottom"/>
+            app:layout_anchorGravity="right|bottom"
+            android:onClick="changeEditMode()"/>
 
     </android.support.design.widget.CoordinatorLayout>
 
