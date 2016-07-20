@@ -24,5 +24,7 @@
     <string name="user_fio">Марухин Михаил</string>
     <string name="teams_title">Команды</string>
     <string name="action_search">поиск...</string>
+    <string name="progress_dialog_up">Working...</string>
+    <string name="progress_dialog_mid">Downloading Data...</string>
 
 </resources>

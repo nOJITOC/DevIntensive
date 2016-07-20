@@ -24,7 +24,6 @@ import com.softdesign.devintensive.data.network.res.UserRes;
 import com.softdesign.devintensive.data.storage.models.MainUserDTO;
 import com.softdesign.devintensive.data.storage.models.RepositoryDao;
 import com.softdesign.devintensive.data.storage.models.UserDao;
-import com.softdesign.devintensive.utils.AppConfig;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
 import com.softdesign.devintensive.utils.eventbus.ChargingEvent;
@@ -78,7 +77,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void onStart() {
-        this.pd = ProgressDialog.show(this, "Working..", "Downloading Data...", true, false);
+        this.pd = ProgressDialog.show(this, getString(R.string.progress_dialog_up),  getString(R.string.progress_dialog_mid), true, false);
         Log.d(TAG, "onStart: ");
         mBus = EventBus.getDefault();
         mBus.register(this);
@@ -149,6 +148,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                     Log.e(ConstantManager.TAG_PREFIX, "" + response.code());
                     if (response.code() == 200) {
                         loginSuccess(response.body().getData());
+                        pd.hide();
                     } else {
                         showSnackbar("Токен просрочен");
                         pd.hide();
@@ -159,10 +159,11 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                 public void onFailure(Call<UserRes> call, Throwable t) {
                     //TODO 11.07.2016 обработать ошибки
                     t.getStackTrace();
+                    pd.hide();
                 }
+
             });
         } else {
-            showSnackbar("Сеть на данный момент не доступна, загружаем предыдущие данные");
             toMainActivity();
             pd.hide();
         }
@@ -173,7 +174,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.login_btn:
-                pd = ProgressDialog.show(this, "Working..", "Downloading Data...", true, false);
+                pd = ProgressDialog.show(this, getString(R.string.progress_dialog_up),  getString(R.string.progress_dialog_mid), true, false);
                 mBus.post(new ChargingEvent("signIn"));
                 break;
             case R.id.remember_txt:
@@ -203,22 +204,21 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
             mDataManager.getPreferencesManager().saveMainUser(mMainUser);
 //            mDataManager.getPreferencesManager().setLastUpdateDate(nowDate);
 //        }
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                toMainActivity();
-            }
-        }, AppConfig.START_DELAY);
+        toMainActivity();
 
 
     }
 
     private void toMainActivity() {
-        if (mMainUser != null) {
-            Intent toMainActivity = new Intent(AuthActivity.this, MainActivity.class);
-            startActivity(toMainActivity);
-        }
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent toMainActivity = new Intent(AuthActivity.this, MainActivity.class);
+                startActivity(toMainActivity);
+            }
+        },ConstantManager.RUN_DELAY);
+
     }
 
     private void signIn() {
@@ -236,11 +236,16 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                         mDataManager.getPreferencesManager().saveAuthToken(userModel.getData().getToken());
                         mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUserData().getId());
                         loginSuccess(userModel.getData().getUserData());
-
+                        pd.hide();
                     } else if (response.code() == 403) {
                         showSnackbar("Неверный логин или пароль");
+                        pd.hide();
+
                     } else {
                         showSnackbar("Что-то пошло не так!");
+                        pd.hide();
+
+
                     }
 
                 }
@@ -249,17 +254,22 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                 public void onFailure(Call<UserModelRes> call, Throwable t) {
                     //TODO 11.07.2016 обработать ошибки
                     Log.e(TAG, "onFailure: " + t.getMessage());
+
+
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
+                            pd.hide();
                             toMainActivity();
                         }
                     },ConstantManager.RUN_DELAY);
                 }
             });
         } else {
+
             showSnackbar("Сеть на данный момент не доступна, пробуем загрузить предыдущие данные");
+            pd.hide();
             toMainActivity();
         }
 

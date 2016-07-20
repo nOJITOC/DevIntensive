@@ -45,6 +45,7 @@ import com.softdesign.devintensive.data.storage.models.UserDao;
 import com.softdesign.devintensive.ui.adapters.UsersAdapter;
 import com.softdesign.devintensive.ui.fragments.RetainedFragment;
 import com.softdesign.devintensive.utils.ConstantManager;
+import com.softdesign.devintensive.utils.NetworkStatusChecker;
 import com.softdesign.devintensive.utils.eventbus.ChargingEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -194,64 +195,69 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     }
 
     private void refreshUsersInDb() {
-        pd = ProgressDialog.show(UserListActivity.this, "Working..", "Downloading Data...", true, false);
+        pd = ProgressDialog.show(UserListActivity.this, getString(R.string.progress_dialog_up), getString(R.string.progress_dialog_mid), true, false);
+        if (NetworkStatusChecker.isNetworkAvailable(this)) {
+            Call<UserListRes> call = mDataManager.getUserList();
+            final List<UserDTO> tempUsers = new ArrayList<>();
+            call.enqueue(new Callback<UserListRes>() {
+                @Override
+                public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
+                    Log.e(TAG, "onResponse: " + response.code());
+                    try {
+                        if (response.code() == 200) {
+                            List<Repository> allRepositories = new ArrayList<Repository>();
+                            List<User> allUsers = new ArrayList<User>();
+                            Long pos = 1l;
+                            for (UserData userData : response.body().getData()) {
+                                allRepositories.addAll(getRepoListFromUser(userData));
+                                allUsers.add(new User(userData, pos));
+                                pos++;
+                            }
 
-        Call<UserListRes> call = mDataManager.getUserList();
-        final List<UserDTO> tempUsers = new ArrayList<>();
-        call.enqueue(new Callback<UserListRes>() {
-            @Override
-            public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
-                Log.e(TAG, "onResponse: " + response.code());
-                try {
-                    if (response.code() == 200) {
-                        List<Repository> allRepositories = new ArrayList<Repository>();
-                        List<User> allUsers = new ArrayList<User>();
-                        Long pos = 1l;
-                        for (UserData userData : response.body().getData()) {
-                            allRepositories.addAll(getRepoListFromUser(userData));
-                            allUsers.add(new User(userData, pos));
-                            pos++;
+                            mUserDao.insertOrReplaceInTx(allUsers);
+                            mRepositoryDao.insertOrReplaceInTx(allRepositories);
+
+                            mConnector.runOperation(new SaveUsersInDbOperation(allUsers, false), false);
+                            loadUsersFromDb();
+
+                        } else {
+                            showSnackbar("Список пользователей не может быть получен");
+                            Log.e(TAG, "onResponse: " + String.valueOf(response.errorBody().source()));
                         }
-
-                        mUserDao.insertOrReplaceInTx(allUsers);
-                        mRepositoryDao.insertOrReplaceInTx(allRepositories);
-
-                        mConnector.runOperation(new SaveUsersInDbOperation(allUsers, false), false);
-                        loadUsersFromDb();
-
-                    } else {
-                        showSnackbar("Список пользователей не может быть получен");
-                        Log.e(TAG, "onResponse: " + String.valueOf(response.errorBody().source()));
+                    } catch (Exception e) {
+                        Log.e(TAG, "onResponse: " + e.getClass() + e.getMessage());
+                        showSnackbar("Что-то пошло не так");
                     }
-                } catch (Exception e) {
-                    Log.e(TAG, "onResponse: " + e.getClass() + e.getMessage());
-                    showSnackbar("Что-то пошло не так");
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            pd.hide();
+                        }
+                    }, ConstantManager.RUN_DELAY);
                 }
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        pd.hide();
-                    }
-                }, ConstantManager.RUN_DELAY);
-            }
 
-            @Override
-            public void onFailure(Call<UserListRes> call, Throwable t) {
-                pd = ProgressDialog.show(UserListActivity.this, "Working..", "Downloading Data...", true, false);
+                @Override
+                public void onFailure(Call<UserListRes> call, Throwable t) {
+                    pd = ProgressDialog.show(UserListActivity.this, getString(R.string.progress_dialog_up),  getString(R.string.progress_dialog_mid), true, false);
 
 //// TODO: 14.07.2016 обработать ошибок
-                showSnackbar("Что-то случилось...");
-                Log.e(TAG, "onFailure: " + t.getMessage());
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        pd.hide();
-                    }
-                }, ConstantManager.SEARCH_DELAY);
-                finish();
-            }
-        });
-        Log.w(TAG, "initUsers(): " + tempUsers.size());
+                    showSnackbar("Что-то случилось...");
+                    Log.e(TAG, "onFailure: " + t.getMessage());
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            pd.hide();
+                        }
+                    }, ConstantManager.SEARCH_DELAY);
+                    finish();
+                }
+            });
+        }
+        else{
+            showSnackbar("");
+            Log.w(TAG, "initUsers(): ");
+        }
+
     }
 
     private void refreshUsersInDb(List<User> userData) {
