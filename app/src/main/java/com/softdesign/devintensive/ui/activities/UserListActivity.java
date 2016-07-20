@@ -126,10 +126,9 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
                 showProgress();
                 mBus.post(new ChargingEvent("dbFound"));
             }
-        } else{
+        } else {
             loadUsers();
         }
-
 
 
         if (savedInstanceState == null) {
@@ -177,7 +176,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     }
 
     private void loadUsersFromDb() {
-        mConnector.runOperation(new LoadUsersFromDbOperation(),false);
+        mConnector.runOperation(new LoadUsersFromDbOperation(), false);
     }
 
     private void setupSwipe() {
@@ -186,8 +185,8 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
             @Override
             public void onRefresh() {
 
-                        mBus.post(new ChargingEvent("DbInSave"));
-                        mSwipeRefreshLayout.setRefreshing(false);
+                mBus.post(new ChargingEvent("DbInSave"));
+                mSwipeRefreshLayout.setRefreshing(false);
 
 
             }
@@ -202,21 +201,23 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         call.enqueue(new Callback<UserListRes>() {
             @Override
             public void onResponse(Call<UserListRes> call, Response<UserListRes> response) {
-                Log.e(TAG, "onResponse: "+response.code() );
+                Log.e(TAG, "onResponse: " + response.code());
                 try {
                     if (response.code() == 200) {
                         List<Repository> allRepositories = new ArrayList<Repository>();
                         List<User> allUsers = new ArrayList<User>();
+                        Long pos = 1l;
                         for (UserData userData : response.body().getData()) {
                             allRepositories.addAll(getRepoListFromUser(userData));
-                            allUsers.add(new User(userData));
+                            allUsers.add(new User(userData, pos));
+                            pos++;
                         }
 
                         mUserDao.insertOrReplaceInTx(allUsers);
                         mRepositoryDao.insertOrReplaceInTx(allRepositories);
 
-                        mConnector.runOperation(new SaveUsersInDbOperation(allUsers,false),false);
-                        mConnector.runOperation(new LoadUsersFromDbOperation(),false);
+                        mConnector.runOperation(new SaveUsersInDbOperation(allUsers, false), false);
+                        loadUsersFromDb();
 
                     } else {
                         showSnackbar("Список пользователей не может быть получен");
@@ -252,11 +253,21 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         });
         Log.w(TAG, "initUsers(): " + tempUsers.size());
     }
-    private void refreshUsersInDb(List<User> userData){
-        mConnector.runOperation(new LoadUsersFromDbOperation(),false);
-        System.out.println();
+
+    private void refreshUsersInDb(List<User> userData) {
+        mUserDao.deleteAll();
+        mRepositoryDao.deleteAll();
+        List<Repository> repositories = new ArrayList<>();
+        for (User user : userData) {
+            repositories.addAll(user.getRepositories());
+
+        }
+        mUserDao.insertOrReplaceInTx(userData);
+        mRepositoryDao.insertOrReplaceInTx(repositories);
+//        mConnector.runOperation(new SaveUsersInDbOperation(userData,true),false);
 
     }
+
     private List<Repository> getRepoListFromUser(UserData userData) {
 
         final String userId = userData.getId().toString();
@@ -400,12 +411,13 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         mHandler = new Handler();
         if (event.message == "DbInSave") {
             refreshUsersInDb();
-        } else if (event.message == "dbFound"){
+        } else if (event.message == "dbFound") {
             loadUsersFromDb();
             loadUsers();
         }
     }
-    ItemTouchHelper.SimpleCallback simpleCallbackItemTouchHelper = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT){
+
+    ItemTouchHelper.SimpleCallback simpleCallbackItemTouchHelper = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT) {
 
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -415,12 +427,15 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
             User prev = dataFragment.getData().remove(fromPosition);
             dataFragment.getData().add(toPosition > fromPosition ? toPosition - 1 : toPosition, prev);
-            Long fromId = dataFragment.getData().get(fromPosition).getId();
-            Long toId = dataFragment.getData().get(toPosition).getId();
+            Long fromPos = dataFragment.getData().get(fromPosition).getPosition();
+            Long toPos = dataFragment.getData().get(toPosition).getPosition();
 
-            dataFragment.getData().get(fromPosition).setId((long)(dataFragment.getData().size()+1));
-            dataFragment.getData().get(toPosition).setId(fromId);
-            dataFragment.getData().get(fromPosition).setId(toId);
+//            dataFragment.getData().get(fromPosition).setId((long) (dataFragment.getData().size() + 1));
+//            dataFragment.getData().get(toPosition).setId(fromId);
+//            dataFragment.getData().get(fromPosition).setId(toId);
+
+            dataFragment.getData().get(toPosition).setPosition(fromPos);
+            dataFragment.getData().get(fromPosition).setPosition(toPos);
             mUsersAdapter.notifyItemMoved(fromPosition, toPosition);
 
 //            mUsersAdapter.notifyItemMoved(fromPosition, toPosition);
@@ -435,6 +450,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
             mUsersAdapter.notifyDataSetChanged();
         }
     };
+
     public void onOperationFinished(final SaveUsersInDbOperation.Result result) {
         Log.d(TAG, "onOperationFinished: ");
         if (result.isSuccessful()) {
@@ -443,6 +459,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
         }
     }
+
     public void onOperationFinished(final LoadUsersFromDbOperation.Result result) {
         Log.d(TAG, "onOperationFinished: ");
         if (result.isSuccessful()) {
@@ -450,7 +467,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
             loadUsers();
 
         } else {
-            Log.e(TAG, "onOperationFinished: "+result.getErrorMessage());
+            Log.e(TAG, "onOperationFinished: " + result.getErrorMessage());
         }
     }
 

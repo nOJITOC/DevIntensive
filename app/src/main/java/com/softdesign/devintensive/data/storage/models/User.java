@@ -37,6 +37,7 @@ public class User {
 
     private int projects;
 
+    private Long position;
 
     private String bio;
     @ToMany(joinProperties = {
@@ -52,7 +53,19 @@ public class User {
         this.codeLines = userData.getProfileValues().getLinesCode();
         this.projects = userData.getProfileValues().getProjects();
         this.searchName = userData.getFullName().toUpperCase();
+        this.position = position;
     }
+    public User(UserData userData) {
+        this.remoteId = userData.getId();
+        this.photo = userData.getPublicInfo().getPhoto();
+        this.bio = userData.getPublicInfo().getBio();
+        this.fullName = userData.getFullName();
+        this.rating = userData.getProfileValues().getRating();
+        this.codeLines = userData.getProfileValues().getLinesCode();
+        this.projects = userData.getProfileValues().getProjects();
+        this.searchName = userData.getFullName().toUpperCase();
+    }
+
 
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
@@ -214,9 +227,20 @@ public class User {
     }
 
 
-    @Generated(hash = 1023608416)
+    public Long getPosition() {
+        return this.position;
+    }
+
+
+    public void setPosition(Long position) {
+        this.position = position;
+    }
+
+
+    @Generated(hash = 1807168756)
     public User(Long id, @NotNull String remoteId, String photo, @NotNull String fullName,
-                @NotNull String searchName, int rating, int codeLines, int projects, String bio) {
+            @NotNull String searchName, int rating, int codeLines, int projects, Long position,
+            String bio) {
         this.id = id;
         this.remoteId = remoteId;
         this.photo = photo;
@@ -225,8 +249,10 @@ public class User {
         this.rating = rating;
         this.codeLines = codeLines;
         this.projects = projects;
+        this.position = position;
         this.bio = bio;
     }
+
 
     @Generated(hash = 586692638)
     public User() {

@@ -16,7 +16,7 @@ public class LoadUsersFromDbOperation extends ChronosOperation<List<User>> {
 
     @Override
     public List<User> run() {
-       return DataManager.getInstance().getUserListFromDb();
+       return DataManager.getInstance().getUserListFromDbByPosition();
     }
     @NonNull
     @Override

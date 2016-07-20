@@ -90,7 +90,23 @@ public class DataManager {
                     .where(UserDao.Properties.CodeLines.gt(0))
                     .orderAsc(UserDao.Properties.Id)
                     .build()
-            .list();
+                    .list();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        for (Long i = 0l; i < users.size(); i++) {
+            users.get(i.intValue()).setPosition(i+1);
+        }
+        return users;
+    }
+    public List<User> getUserListFromDbByPosition(){
+        List<User> users = new ArrayList<>();
+        try {
+            users = mDaoSession.queryBuilder(User.class)
+                    .where(UserDao.Properties.CodeLines.gt(0))
+                    .orderAsc(UserDao.Properties.Position)
+                    .build()
+                    .list();
         }catch (Exception e){
             e.printStackTrace();
         }
