@@ -12,11 +12,11 @@ public class UserListRes {
     @Expose
     private boolean success;
 
-    public List<User> getData() {
+    public List<UserData> getData() {
         return data;
     }
 
     @SerializedName("data")
     @Expose
-    private List<User> data = new ArrayList<User>();
+    private List<UserData> data = new ArrayList<UserData>();
 }

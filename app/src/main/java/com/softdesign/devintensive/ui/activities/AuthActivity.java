@@ -1,8 +1,10 @@
 package com.softdesign.devintensive.ui.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
@@ -12,15 +14,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.redmadrobot.chronos.ChronosConnector;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.req.UserLoginReq;
-import com.softdesign.devintensive.data.network.res.User;
+import com.softdesign.devintensive.data.network.res.UserData;
 import com.softdesign.devintensive.data.network.res.UserModelRes;
 import com.softdesign.devintensive.data.network.res.UserRes;
+import com.softdesign.devintensive.data.storage.models.MainUserDTO;
+import com.softdesign.devintensive.data.storage.models.RepositoryDao;
+import com.softdesign.devintensive.data.storage.models.UserDao;
+import com.softdesign.devintensive.utils.AppConfig;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.NetworkStatusChecker;
-import com.softdesign.devintensive.utils.UserInfoUpdateHelper;
+import com.softdesign.devintensive.utils.eventbus.ChargingEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,21 +59,84 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     @BindView(R.id.main_coordinator)
     CoordinatorLayout mCoordinatorLayout;
     private DataManager mDataManager;
-
+    private RepositoryDao mRepositoryDao;
+    private UserDao mUserDao;
+    private MainUserDTO mMainUser;
+    private ProgressDialog pd = null;
+    private EventBus mBus;
+    private ChronosConnector mConnector;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDataManager = DataManager.getInstance();
-        showProgress();
-        if (mDataManager.getPreferencesManager().getAuthToken() != null) {
-            authByToken();
-        }
         setContentView(R.layout.activity_loginning);
-        hideProgress();
+        mConnector = new ChronosConnector();
+        mConnector.onCreate(this, savedInstanceState);
 
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        this.pd = ProgressDialog.show(this, "Working..", "Downloading Data...", true, false);
+        Log.d(TAG, "onStart: ");
+        mBus = EventBus.getDefault();
+        mBus.register(this);
         ButterKnife.bind(this);
+        mDataManager = DataManager.getInstance();
         mRememberPswd.setOnClickListener(this);
         mBtnSignUp.setOnClickListener(this);
+        if(mDataManager.getPreferencesManager().getAuthToken()!=null){
+            mBus.post(new ChargingEvent("auth"));
+        }else{
+            pd.hide();
+        }
+        super.onStart();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mConnector.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.d(TAG, "onRestart: ");
+        super.onRestart();
+    }
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void authBackgroundThread(ChargingEvent event){
+        Log.i(TAG, "BusEvent" + Thread.currentThread().getName());
+        mUserDao = mDataManager.getDaoSession().getUserDao();
+        mRepositoryDao = mDataManager.getDaoSession().getRepositoryDao();
+        if(event.message=="auth")authByToken();
+        else if(event.message=="signIn") {
+            signIn();
+        }
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mConnector.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mBus.unregister(this);
+        super.onPause();
+        mConnector.onPause();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
     }
 
     private void authByToken() {
@@ -75,29 +149,32 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                     Log.e(ConstantManager.TAG_PREFIX, "" + response.code());
                     if (response.code() == 200) {
                         loginSuccess(response.body().getData());
-
-                    } else if (response.code() == 404) {
-                        showSnackBar("Неверный логин или пароль");
                     } else {
-                        showSnackBar("Всё пропало Шеф!!!");
+                        showSnackbar("Токен просрочен");
+                        pd.hide();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<UserRes> call, Throwable t) {
                     //TODO 11.07.2016 обработать ошибки
+                    t.getStackTrace();
                 }
             });
         } else {
-            showSnackBar("Сеть на данный момент не доступна, загружаем предыдущие данные");
+            showSnackbar("Сеть на данный момент не доступна, загружаем предыдущие данные");
+            toMainActivity();
+            pd.hide();
         }
+
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.login_btn:
-                signIn();
+                pd = ProgressDialog.show(this, "Working..", "Downloading Data...", true, false);
+                mBus.post(new ChargingEvent("signIn"));
                 break;
             case R.id.remember_txt:
                 rememberPassword();
@@ -106,37 +183,42 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
-    private void showSnackBar(String msg) {
+    private void showSnackbar(String msg) {
         Snackbar.make(mCoordinatorLayout, msg, Snackbar.LENGTH_LONG).show();
     }
 
     private void rememberPassword() {
-        Intent rememberIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://devintensive.softdesign-apps.ru/forgotpass"));
+        Intent rememberIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.forget_pswd)));
         startActivity(rememberIntent);
     }
 
-    private void loginSuccess(User user) {
+    private void loginSuccess(UserData userData) {
 
 
-        String nowDate = user.getUpdated();
-        String oldDate = mDataManager.getPreferencesManager().getLastUpdateDate();
+//        String nowDate = userData.getUpdated();
+//        mMainUser=mDataManager.getPreferencesManager().loadMainUser();
+//        String oldDate = mDataManager.getPreferencesManager().getLastUpdateDate();
+//        if (nowDate.equals(oldDate) || oldDate == null||mMainUser==null) {
+            mMainUser = new MainUserDTO(userData);
+            mDataManager.getPreferencesManager().saveMainUser(mMainUser);
+//            mDataManager.getPreferencesManager().setLastUpdateDate(nowDate);
+//        }
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                toMainActivity();
+            }
+        }, AppConfig.START_DELAY);
 
-        if (!nowDate.equals(oldDate) || oldDate == null) {
-            UserInfoUpdateHelper resHelper = new UserInfoUpdateHelper(user);
-            resHelper.saveUserValues();
-            resHelper.saveUserFields();
-            resHelper.saveUserFio();
-            resHelper.saveUserPhoto();
-            resHelper.saveUserAvatar();
-            mDataManager.getPreferencesManager().setLastUpdateDate(nowDate);
-        }
-        toMainActivity();
 
     }
 
     private void toMainActivity() {
-        Intent toMainActivity = new Intent(AuthActivity.this, MainActivity.class);
-        startActivity(toMainActivity);
+        if (mMainUser != null) {
+            Intent toMainActivity = new Intent(AuthActivity.this, MainActivity.class);
+            startActivity(toMainActivity);
+        }
     }
 
     private void signIn() {
@@ -150,28 +232,36 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                     Log.e(ConstantManager.TAG_PREFIX, "" + response.code());
                     if (response.code() == 200) {
                         UserModelRes userModel = response.body();
-                        showSnackBar(userModel.getData().getToken());
+                        showSnackbar(userModel.getData().getToken());
                         mDataManager.getPreferencesManager().saveAuthToken(userModel.getData().getToken());
-                        mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUser().getId());
-                        loginSuccess(userModel.getData().getUser());
+                        mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUserData().getId());
+                        loginSuccess(userModel.getData().getUserData());
 
-                    } else if (response.code() == 404) {
-                        showSnackBar("Неверный логин или пароль");
+                    } else if (response.code() == 403) {
+                        showSnackbar("Неверный логин или пароль");
                     } else {
-                        showSnackBar("Всё пропало Шеф!!!");
+                        showSnackbar("Что-то пошло не так!");
                     }
+
                 }
 
                 @Override
                 public void onFailure(Call<UserModelRes> call, Throwable t) {
                     //TODO 11.07.2016 обработать ошибки
+                    Log.e(TAG, "onFailure: " + t.getMessage());
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            toMainActivity();
+                        }
+                    },ConstantManager.RUN_DELAY);
                 }
             });
         } else {
-            showSnackBar("Сеть на данный момент не доступна, загружаем предыдущие данные");
+            showSnackbar("Сеть на данный момент не доступна, пробуем загрузить предыдущие данные");
             toMainActivity();
         }
+
     }
-
-
 }

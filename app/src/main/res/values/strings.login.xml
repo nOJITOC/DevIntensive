@@ -14,5 +14,6 @@
     <string name="get_password">Забыли пароль?</string>
     <string name="ff_medium">sans-serif-medium</string>
     <string name="ff_regular">sans-serif</string>
+    <string name="forget_pswd">http://devintensive.softdesign-apps.ru/forgotpass</string>
 
 </resources>

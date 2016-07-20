@@ -4,8 +4,6 @@ package com.softdesign.devintensive.data.storage.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.softdesign.devintensive.data.network.res.User;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,19 +16,6 @@ public class UserDTO implements Parcelable {
     private String mBio;
     private List<String> mRepositories;
 
-    public UserDTO(User user) {
-        List<String> repoLink=new ArrayList<>();
-        for (User.Repo repo : user.getRepositories().getRepo()) {
-            repoLink.add(repo.getGit());
-        }
-        mPhoto = user.getPublicInfo().getPhoto();
-        mFullName = user.getFullName();
-        mRating = String.valueOf(user.getProfileValues().getRating());
-        mCodeLines = String.valueOf(user.getProfileValues().getLinesCode());
-        mProjects = String.valueOf(user.getProfileValues().getProjects());
-        mBio = user.getPublicInfo().getBio();
-        mRepositories = repoLink;
-    }
 
     protected UserDTO(Parcel in) {
         mPhoto = in.readString();
@@ -45,6 +30,20 @@ public class UserDTO implements Parcelable {
         } else {
             mRepositories = null;
         }
+    }
+
+    public UserDTO(User userData) {
+        List<String> repoLink=new ArrayList<>();
+        for (Repository repo : userData.getRepositories()) {
+            repoLink.add(repo.getRepositoryName());
+        }
+        mPhoto = userData.getPhoto();
+        mFullName = userData.getFullName();
+        mRating = String.valueOf(userData.getRating());
+        mCodeLines = String.valueOf(userData.getCodeLines());
+        mProjects = String.valueOf(userData.getProjects());
+        mBio = userData.getBio();
+        mRepositories = repoLink;
     }
 
     @Override

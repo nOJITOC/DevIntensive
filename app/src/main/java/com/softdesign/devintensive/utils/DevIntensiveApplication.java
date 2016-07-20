@@ -5,20 +5,36 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-public class DevIntensiveApplication extends Application{
+import com.facebook.stetho.Stetho;
+import com.softdesign.devintensive.data.storage.models.DaoMaster;
+import com.softdesign.devintensive.data.storage.models.DaoSession;
+
+import org.greenrobot.greendao.database.Database;
+
+public class DevIntensiveApplication extends Application {
     public static SharedPreferences sSharedPreferences;
-    private static Context mContext;
+    private static Context sContext;
+    private static DaoSession sDaoSession;
 
     public static Context getContext() {
-        return mContext;
+        return sContext;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         sSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mContext = this;
+        sContext = this;
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "devintensive = db");
+        Database db = helper.getWritableDb();
+        sDaoSession = new DaoMaster(db).newSession();
 
+        Stetho.initializeWithDefaults(this);
+
+    }
+
+    public static DaoSession getDaoSession() {
+        return sDaoSession;
     }
 
     public static SharedPreferences getSharedPreferences() {

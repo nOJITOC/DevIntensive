@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     android:id="@+id/nested_scroll_for_et"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior=".ui.behaviors.CustomNestedScrollBehavior">
@@ -138,22 +139,32 @@
             <LinearLayout
                 style="@style/middle_layout">
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <TextView
+
+                style="@style/git_hint"
+                android:text="@string/description_repository"
+                />
                 <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
+                    <Spinner
+                        android:id="@+id/git_spiner"
+                        style="@style/spinner"
+                        android:layout_marginTop="@dimen/spacing_medial_24">
 
+                    </Spinner>
                     <EditText
-                        android:id="@+id/github_et"
+                        android:id="@+id/git_placeholder"
                         style="@style/edit_text"
-                        android:hint="@string/description_repository"
-                        android:inputType="textMultiLine"
-                        android:text="@string/repository"
-
+                        android:layout_marginTop="@dimen/spacing_normal_16"
+                        android:inputType="textUri|textMultiLine"
+                        android:visibility="gone"
                         />
-
                 </android.support.design.widget.TextInputLayout>
-
-
+            </FrameLayout>
             </LinearLayout>
 
             <ImageView
@@ -200,7 +211,6 @@
 
         <View
             style="@style/line"/>
-
 
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

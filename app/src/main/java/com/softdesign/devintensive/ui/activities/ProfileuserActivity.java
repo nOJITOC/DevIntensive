@@ -7,8 +7,8 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -28,7 +28,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ProfileUserActivity extends AppCompatActivity {
+public class ProfileUserActivity extends BaseActivity {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.bio_et)
@@ -50,11 +50,13 @@ public class ProfileUserActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        showProgress();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_user);
         ButterKnife.bind(this);
         setupToolbar();
         initProfileData();
+        hideProgress();
     }
 
     private void setupToolbar() {
@@ -67,6 +69,9 @@ public class ProfileUserActivity extends AppCompatActivity {
 
     private void initProfileData() {
         UserDTO userDTO = getIntent().getParcelableExtra(ConstantManager.PARCELABLE_KEY);
+        try {
+
+
         final List<String> repositories = userDTO.getRepositories();
         final RepositoriesAdapter repositoriesAdapter = new RepositoriesAdapter(this, repositories);
         mRepoListView.setAdapter(repositoriesAdapter);
@@ -98,7 +103,11 @@ public class ProfileUserActivity extends AppCompatActivity {
                 .error(R.drawable.user_bg)
 
         .into(mProfileImage)
-        ;
+        ;}
+        catch (NullPointerException e){
+            Log.e(TAG, "initProfileData: "+e.getMessage() );
+            finish();
+        }
 
     }
 }

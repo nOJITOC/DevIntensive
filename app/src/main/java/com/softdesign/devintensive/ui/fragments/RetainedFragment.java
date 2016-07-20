@@ -3,7 +3,7 @@ package com.softdesign.devintensive.ui.fragments;
 import android.app.Fragment;
 import android.os.Bundle;
 
-import com.softdesign.devintensive.data.storage.models.UserDTO;
+import com.softdesign.devintensive.data.storage.models.User;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class RetainedFragment extends Fragment {
     // data object we want to retain
-    private List<UserDTO> mUsers;
+    private List<User> mUsers;
 
     // this method is only called once for this fragment
     @Override
@@ -22,11 +22,12 @@ public class RetainedFragment extends Fragment {
         setRetainInstance(true);
     }
 
-    public void setData(List<UserDTO> data) {
+    public void setData(List<User> data) {
         this.mUsers = data;
     }
 
-    public List<UserDTO> getData() {
+
+    public List<User> getData() {
         return mUsers;
     }
 }

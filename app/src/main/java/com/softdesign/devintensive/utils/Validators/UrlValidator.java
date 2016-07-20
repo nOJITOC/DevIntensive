@@ -37,7 +37,7 @@ public class UrlValidator extends BaseValidator{
     @Override
     protected boolean isValid(String target) {
         if(target.indexOf(mDefaultValue)!=0) return false;
-        String pattern = "[a-zA-Z]{1}[\\w_/]{"+(mSymbolsAfterDefaultValue-1)+",}";
+        String pattern = "[a-zA-Z]{1}[\\w_/\\-]{"+(mSymbolsAfterDefaultValue-1)+",}";
         return target.trim().substring(mDefaultValue.length()).matches(pattern);
     }
 
