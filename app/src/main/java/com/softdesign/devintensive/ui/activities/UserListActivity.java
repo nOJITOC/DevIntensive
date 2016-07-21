@@ -363,13 +363,13 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
 
-        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
 
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                searchView.onActionViewExpanded();
+                searchView.onActionViewCollapsed();
                 return true;
             }
         });
@@ -403,9 +403,10 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 //                mRecyclerView.swapAdapter(new UsersAdapter(users, mCustomClickListener), false);
                 mUsersAdapter.setUsers(users);
                 mUsersAdapter.notifyDataSetChanged();
+
             }
         };
-//        mHandler.removeCallbacks(searchUsers);
+        mHandler.removeCallbacks(searchUsers);
         mHandler.postDelayed(searchUsers, delay);
 
         return true;
