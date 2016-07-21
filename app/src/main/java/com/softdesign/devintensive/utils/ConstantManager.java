@@ -31,5 +31,5 @@ public interface ConstantManager {
     int CAMERA_REQUEST_PERMISSION_CODE = 102;
     float BEHAVIOR_MULTIPIER = 112.0f / 256f;
     int SEARCH_DELAY = 1500;
-    int RUN_DELAY = 500;
+    int RUN_DELAY = 1500;
 }

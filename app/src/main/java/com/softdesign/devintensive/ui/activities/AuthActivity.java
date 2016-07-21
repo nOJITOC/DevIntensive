@@ -148,7 +148,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                     Log.e(ConstantManager.TAG_PREFIX, "" + response.code());
                     if (response.code() == 200) {
                         loginSuccess(response.body().getData());
-                        pd.hide();
                     } else {
                         showSnackbar("Введите логин и пароль");
                         pd.hide();
@@ -165,7 +164,6 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
             });
         } else {
             toMainActivity();
-            pd.hide();
         }
 
     }
@@ -216,6 +214,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
             public void run() {
                 Intent toMainActivity = new Intent(AuthActivity.this, MainActivity.class);
                 startActivity(toMainActivity);
+                pd.hide();
             }
         },ConstantManager.RUN_DELAY);
 
@@ -255,21 +254,13 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                     //TODO 11.07.2016 обработать ошибки
                     Log.e(TAG, "onFailure: " + t.getMessage());
 
-
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            pd.hide();
                             toMainActivity();
-                        }
-                    },ConstantManager.RUN_DELAY);
+
                 }
             });
         } else {
 
             showSnackbar("Сеть на данный момент не доступна, пробуем загрузить предыдущие данные");
-            pd.hide();
             toMainActivity();
         }
 
