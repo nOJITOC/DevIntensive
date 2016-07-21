@@ -177,7 +177,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     }
 
     private void loadUsersFromDb() {
-        mConnector.runOperation(new LoadUsersFromDbOperation(),true);
+        mConnector.runOperation(new LoadUsersFromDbOperation(),false);
     }
 
     private void setupSwipe() {
@@ -187,6 +187,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
             public void onRefresh() {
 
                 refreshUsersInDb();
+                loadUsersFromDb();
                 mSwipeRefreshLayout.setRefreshing(false);
 
 
@@ -218,7 +219,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
                             mRepositoryDao.insertOrReplaceInTx(allRepositories);
 //
 //                            mConnector.runOperation(new SaveUsersInDbOperation(allUsers, allRepositories), false);
-                            loadUsersFromDb();
+//                            loadUsersFromDb();
 
                         } else {
                             showSnackbar("Список пользователей не может быть получен");
@@ -228,12 +229,17 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
                         Log.e(TAG, "onResponse: " + e.getClass() + e.getMessage());
                         showSnackbar("Что-то пошло не так");
                     }
+                    try{
+                        mHandler= new Handler();
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            pd.hide();
+                            if(pd!=null)pd.hide();
                         }
-                    }, ConstantManager.RUN_DELAY);
+                    }, ConstantManager.RUN_DELAY);}
+                    catch (Exception e){
+                        Log.e(TAG, "onResponse: "+ e.getClass() + e.getMessage() );
+                    }
                 }
 
                 @Override
@@ -243,10 +249,11 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 //// TODO: 14.07.2016 обработать ошибок
                     showSnackbar("Что-то случилось...");
                     Log.e(TAG, "onFailure: " + t.getMessage());
+                    mHandler= new Handler();
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            pd.hide();
+                            if(pd!=null)pd.hide();
                         }
                     }, ConstantManager.SEARCH_DELAY);
                     finish();
@@ -412,6 +419,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         mHandler = new Handler();
         if (event.message == "DbInSave") {
             refreshUsersInDb();
+            loadUsersFromDb();
         } else if (event.message == "dbFound") {
             loadUsersFromDb();
             loadUsers();
