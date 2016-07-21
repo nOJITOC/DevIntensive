@@ -389,7 +389,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     @Override
     public boolean onQueryTextChange(final String newText) {
         int delay = ConstantManager.SEARCH_DELAY;
-        if (newText.isEmpty()) delay = 0;
+        if (newText.isEmpty()) {delay = 0;}
         Runnable searchUsers = new Runnable() {
             @Override
             public void run() {
@@ -447,6 +447,8 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
             dataFragment.getData().get(toPosition).setPosition(fromPos);
             dataFragment.getData().get(fromPosition).setPosition(toPos);
             mUsersAdapter.notifyItemMoved(fromPosition, toPosition);
+            mUserDao.update(dataFragment.getData().get(toPosition));
+            mUserDao.update(dataFragment.getData().get(fromPosition));
 
 //            mUsersAdapter.notifyItemMoved(fromPosition, toPosition);
 
