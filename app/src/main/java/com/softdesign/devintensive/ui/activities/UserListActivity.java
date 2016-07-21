@@ -177,7 +177,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     }
 
     private void loadUsersFromDb() {
-        mConnector.runOperation(new LoadUsersFromDbOperation(), false);
+        mConnector.runOperation(new LoadUsersFromDbOperation(),true);
     }
 
     private void setupSwipe() {
@@ -186,7 +186,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
             @Override
             public void onRefresh() {
 
-                mBus.post(new ChargingEvent("DbInSave"));
+                refreshUsersInDb();
                 mSwipeRefreshLayout.setRefreshing(false);
 
 
@@ -216,8 +216,8 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
                             mUserDao.insertOrReplaceInTx(allUsers);
                             mRepositoryDao.insertOrReplaceInTx(allRepositories);
-
-                            mConnector.runOperation(new SaveUsersInDbOperation(allUsers, false), false);
+//
+//                            mConnector.runOperation(new SaveUsersInDbOperation(allUsers, allRepositories), false);
                             loadUsersFromDb();
 
                         } else {
@@ -261,15 +261,10 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     }
 
     private void refreshUsersInDb(List<User> userData) {
-        mUserDao.deleteAll();
-        mRepositoryDao.deleteAll();
-        List<Repository> repositories = new ArrayList<>();
-        for (User user : userData) {
-            repositories.addAll(user.getRepositories());
+//        mUserDao.deleteAll();
+//        mRepositoryDao.deleteAll();
 
-        }
         mUserDao.insertOrReplaceInTx(userData);
-        mRepositoryDao.insertOrReplaceInTx(repositories);
 //        mConnector.runOperation(new SaveUsersInDbOperation(userData,true),false);
 
     }
@@ -335,7 +330,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     protected void onPause() {
         super.onPause();
         dataFragment.setData(dataFragment.getData());
-        refreshUsersInDb(dataFragment.getData());
+//        refreshUsersInDb(dataFragment.getData());
         mConnector.onPause();
         mBus.unregister(this);
 
@@ -452,7 +447,8 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
             int position = viewHolder.getAdapterPosition();
-            dataFragment.getData().remove(position);
+            User user = dataFragment.getData().remove(position);
+            mUserDao.delete(user);
             mUsersAdapter.notifyDataSetChanged();
         }
     };

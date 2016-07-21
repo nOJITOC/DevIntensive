@@ -12,19 +12,17 @@ import com.softdesign.devintensive.data.storage.models.UserDao;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Иван on 20.07.2016.
  */
 public class SaveUsersInDbOperation  extends ChronosOperation<List<User>> {
-    private Boolean mDoRefresh =false;
     private List<User> mUsers;
-
-    public SaveUsersInDbOperation(List<User> users, Boolean doRefresh) {
+    List<Repository> mRepositories;
+    public SaveUsersInDbOperation(List<User> users,List<Repository> repositories) {
         mUsers = users;
-        mDoRefresh = doRefresh;
+        mRepositories=repositories;
     }
 
     @Nullable
@@ -35,19 +33,9 @@ public class SaveUsersInDbOperation  extends ChronosOperation<List<User>> {
         DataManager dataManager = DataManager.getInstance();
         UserDao userDao = dataManager.getDaoSession().getUserDao();
         RepositoryDao repositoryDao = dataManager.getDaoSession().getRepositoryDao();
-        List<Repository> repositories = new ArrayList<Repository>();
-        List<User> allUsers = new ArrayList<>();
-
-
-        if(mDoRefresh) {
-            userDao.deleteAll();
-            repositoryDao.deleteAll();
-        }
-
-
         System.out.println();
-        userDao.insertOrReplaceInTx(allUsers);
-        repositoryDao.insertOrReplaceInTx(repositories);
+        userDao.insertOrReplaceInTx(mUsers);
+        repositoryDao.insertOrReplaceInTx(mRepositories);
         return mUsers;
     }
 

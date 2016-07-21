@@ -150,7 +150,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                         loginSuccess(response.body().getData());
                         pd.hide();
                     } else {
-                        showSnackbar("Токен просрочен");
+                        showSnackbar("Введите логин и пароль");
                         pd.hide();
                     }
                 }
@@ -232,7 +232,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                     Log.e(ConstantManager.TAG_PREFIX, "" + response.code());
                     if (response.code() == 200) {
                         UserModelRes userModel = response.body();
-                        showSnackbar(userModel.getData().getToken());
+                        showSnackbar("Добро пожаловать");
                         mDataManager.getPreferencesManager().saveAuthToken(userModel.getData().getToken());
                         mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUserData().getId());
                         loginSuccess(userModel.getData().getUserData());
