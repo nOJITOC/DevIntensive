@@ -27,7 +27,7 @@ import retrofit2.Call;
  */
 public class DataManager {
 
-    private static DataManager INSTANCE =null;
+    private static DataManager INSTANCE = null;
     private Picasso mPicasso;
 
     private Context mContext;
@@ -36,7 +36,7 @@ public class DataManager {
     private DaoSession mDaoSession;
 
     public DataManager() {
-        this.mPreferencesManager=new PreferencesManager();
+        this.mPreferencesManager = new PreferencesManager();
         this.mContext = DevIntensiveApplication.getContext();
         this.mRestService = ServiceGenerator.createService(RestService.class);
         this.mPicasso = new PicassoCache(mContext).getPicassoInstance();
@@ -55,35 +55,42 @@ public class DataManager {
         return mPreferencesManager;
     }
 
-    public static DataManager getInstance(){
-        if(INSTANCE==null){
-            INSTANCE=new DataManager();
+    public static DataManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new DataManager();
         }
         return INSTANCE;
 
     }
-    public Context getContex(){
+
+    public Context getContex() {
         return mContext;
     }
+
     //region =========Network===========
-    public Call<UserModelRes> loginUser(UserLoginReq userLoginReq){
+    public Call<UserModelRes> loginUser(UserLoginReq userLoginReq) {
         return mRestService.loginUser(userLoginReq);
     }
-    public Call<UserRes> loginToken(String userId){
+
+    public Call<UserRes> loginToken(String userId) {
         return mRestService.loginToken(userId);
     }
-    public Call<ResponseBody> photoToServer(String userId, MultipartBody.Part file){
+
+    public Call<ResponseBody> photoToServer(String userId, MultipartBody.Part file) {
         return mRestService.photoToServer(userId, file);
     }
-    public Call<UserListRes> getUserListFromNetwork(){
+
+    public Call<UserListRes> getUserListFromNetwork() {
         return mRestService.getuserList();
     }
-    public Call<UserListRes> getUserList(){
+
+    public Call<UserListRes> getUserList() {
         return mRestService.getuserList();
     }
+
     //endregion
     //============================Database===============
-    public List<User> getUserListFromDb(){
+    public List<User> getUserListFromDb() {
         List<User> users = new ArrayList<>();
         try {
             users = mDaoSession.queryBuilder(User.class)
@@ -91,15 +98,16 @@ public class DataManager {
                     .orderAsc(UserDao.Properties.Id)
                     .build()
                     .list();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         for (Long i = 0l; i < users.size(); i++) {
-            users.get(i.intValue()).setPosition(i+1);
+            users.get(i.intValue()).setPosition(i + 1);
         }
         return users;
     }
-    public List<User> getUserListFromDbByPosition(){
+
+    public List<User> getUserListFromDbByPosition() {
         List<User> users = new ArrayList<>();
         try {
             users = mDaoSession.queryBuilder(User.class)
@@ -107,8 +115,29 @@ public class DataManager {
                     .orderAsc(UserDao.Properties.Position)
                     .build()
                     .list();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+        }
+        return users;
+    }
+
+    public List<User> getUserListFromDbByName(String query) {
+        List<User> users = new ArrayList<>();
+        if (query.isEmpty()) {
+            users=getUserListFromDbByPosition();
+        } else {
+            try {
+
+
+                users = mDaoSession.queryBuilder(User.class)
+                        .where(UserDao.Properties.CodeLines.gt(0), UserDao.Properties.SearchName.like("%" + query.toUpperCase() + "%"))
+                        .orderAsc(UserDao.Properties.Position)
+                        .build()
+                        .list();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return users;
     }

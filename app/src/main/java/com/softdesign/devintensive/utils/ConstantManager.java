@@ -32,4 +32,5 @@ public interface ConstantManager {
     float BEHAVIOR_MULTIPIER = 112.0f / 256f;
     int SEARCH_DELAY = 1500;
     int RUN_DELAY = 1500;
+    String QUERY = "QUERY";
 }

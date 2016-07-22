@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Created by Иван on 14.07.2016.
  */
-public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder> {
+public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder>{
     private static final String TAG = ConstantManager.TAG_PREFIX+" UsersAdapter";
     List<User> mUsers;
     Context mContext;

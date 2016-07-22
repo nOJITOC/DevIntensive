@@ -33,6 +33,7 @@ import com.redmadrobot.chronos.ChronosConnector;
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.operations.LoadUsersFromDbOperation;
+import com.softdesign.devintensive.data.network.operations.LoadUsersFromDbOperationByQuery;
 import com.softdesign.devintensive.data.network.operations.SaveUsersInDbOperation;
 import com.softdesign.devintensive.data.network.res.UserData;
 import com.softdesign.devintensive.data.network.res.UserListRes;
@@ -61,7 +62,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class UserListActivity extends BaseActivity implements SearchView.OnQueryTextListener {
+public class UserListActivity extends BaseActivity {
 
 
     public static final String TAG = ConstantManager.TAG_PREFIX + " User List Activity";
@@ -87,6 +88,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     private EventBus mBus;
     private ProgressDialog pd;
     private ChronosConnector mConnector;
+    String mQuery="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +99,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
         mBus = EventBus.getDefault();
         mBus.register(this);
         mConnector = new ChronosConnector();
-
+        mHandler=new Handler();
         mConnector.onCreate(this, savedInstanceState);
         ButterKnife.bind(this);
         mDataManager = DataManager.getInstance();
@@ -134,6 +136,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
         if (savedInstanceState == null) {
         } else {
+            mQuery=savedInstanceState.getString(ConstantManager.QUERY);
         }
     }
 
@@ -166,6 +169,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(ConstantManager.QUERY,mQuery);
         mConnector.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
@@ -177,7 +181,7 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     }
 
     private void loadUsersFromDb() {
-        mConnector.runOperation(new LoadUsersFromDbOperation(),false);
+        mConnector.runOperation(new LoadUsersFromDbOperation(), false);
     }
 
     private void setupSwipe() {
@@ -229,38 +233,37 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
                         Log.e(TAG, "onResponse: " + e.getClass() + e.getMessage());
                         showSnackbar("Что-то пошло не так");
                     }
-                    try{
-                        mHandler= new Handler();
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(pd!=null)pd.hide();
-                        }
-                    }, ConstantManager.RUN_DELAY);}
-                    catch (Exception e){
-                        Log.e(TAG, "onResponse: "+ e.getClass() + e.getMessage() );
+                    try {
+                        mHandler = new Handler();
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (pd != null) pd.hide();
+                            }
+                        }, ConstantManager.RUN_DELAY);
+                    } catch (Exception e) {
+                        Log.e(TAG, "onResponse: " + e.getClass() + e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<UserListRes> call, Throwable t) {
-                    pd = ProgressDialog.show(UserListActivity.this, getString(R.string.progress_dialog_up),  getString(R.string.progress_dialog_mid), true, false);
+                    pd = ProgressDialog.show(UserListActivity.this, getString(R.string.progress_dialog_up), getString(R.string.progress_dialog_mid), true, false);
 
 //// TODO: 14.07.2016 обработать ошибок
                     showSnackbar("Что-то случилось...");
                     Log.e(TAG, "onFailure: " + t.getMessage());
-                    mHandler= new Handler();
+                    mHandler = new Handler();
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if(pd!=null)pd.hide();
+                            if (pd != null) pd.hide();
                         }
                     }, ConstantManager.SEARCH_DELAY);
                     finish();
                 }
             });
-        }
-        else{
+        } else {
             showSnackbar("");
             Log.w(TAG, "initUsers(): ");
         }
@@ -336,7 +339,6 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     @Override
     protected void onPause() {
         super.onPause();
-        dataFragment.setData(dataFragment.getData());
 //        refreshUsersInDb(dataFragment.getData());
         mConnector.onPause();
         mBus.unregister(this);
@@ -358,14 +360,17 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "onCreateOptionsMenu");
-
+    public boolean onPrepareOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
 
         final MenuItem searchItem = menu.findItem(R.id.action_search);
 
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+
+        if(!mQuery.isEmpty()){
+            searchView.onActionViewExpanded();
+            searchView.setQuery(mQuery,false);
+        }
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
@@ -373,43 +378,52 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
                 return true;
             }
         });
-        searchView.setOnQueryTextListener(this);
-        searchItem.expandActionView();
-
-        return true;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-
-
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(final String newText) {
-        int delay = ConstantManager.SEARCH_DELAY;
-        if (newText.isEmpty()) {delay = 0;}
-        Runnable searchUsers = new Runnable() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void run() {
-                List<User> users = new ArrayList<>();
-                for (User user : dataFragment.getData()) {
-
-                    if (user.getFullName().toLowerCase().contains(newText.toLowerCase())) {
-                        users.add(user);
-                    }
-                }
-//                mRecyclerView.swapAdapter(new UsersAdapter(users, mCustomClickListener), false);
-                mUsersAdapter.setUsers(users);
-                mUsersAdapter.notifyDataSetChanged();
-
+            public boolean onQueryTextSubmit(String query) {
+                return false;
             }
-        };
-        mHandler.removeCallbacks(searchUsers);
-        mHandler.postDelayed(searchUsers, delay);
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mQuery = newText;
+                mHandler=new Handler();
+                int delay = ConstantManager.SEARCH_DELAY;
+                if(newText.isEmpty())delay=50;
+                Runnable searchUsers = new Runnable() {
+                    @Override
+                    public void run() {
+
+                            loadUsersFromDbByQuery(mQuery);
+//                    dataFragment.setData(mDataManager.getUserListFromDbByName(newText));
+//
+////                mRecyclerView.swapAdapter(new UsersAdapter(users, mCustomClickListener), false);
+//                    mUsersAdapter = new UsersAdapter(dataFragment.getData(), mCustomClickListener);
+//                    mRecyclerView.setAdapter(mUsersAdapter);
+                    }
+                };
+                mHandler.removeCallbacks(searchUsers);
+                mHandler.postDelayed(searchUsers, delay);
+
+                return true;
+            }
+        });
+        return super.onPrepareOptionsMenu(menu);
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu");
+
 
         return true;
+    }
+
+
+
+    private void loadUsersFromDbByQuery(String query) {
+        mConnector.runOperation(new LoadUsersFromDbOperationByQuery(query), false);
     }
 
     @Subscribe(threadMode = ThreadMode.POSTING)
@@ -474,6 +488,16 @@ public class UserListActivity extends BaseActivity implements SearchView.OnQuery
     }
 
     public void onOperationFinished(final LoadUsersFromDbOperation.Result result) {
+        Log.d(TAG, "onOperationFinished: ");
+        if (result.isSuccessful()) {
+            dataFragment.setData(result.getOutput());
+            loadUsers();
+
+        } else {
+            Log.e(TAG, "onOperationFinished: " + result.getErrorMessage());
+        }
+    }
+    public void onOperationFinished(final LoadUsersFromDbOperationByQuery.Result result) {
         Log.d(TAG, "onOperationFinished: ");
         if (result.isSuccessful()) {
             dataFragment.setData(result.getOutput());
