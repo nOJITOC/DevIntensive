@@ -47,11 +47,9 @@ import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.RestService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
-import com.softdesign.devintensive.data.network.res.UserRes;
 import com.softdesign.devintensive.data.storage.models.MainUserDTO;
 import com.softdesign.devintensive.ui.fragments.MainFragment;
 import com.softdesign.devintensive.utils.ConstantManager;
-import com.softdesign.devintensive.utils.NetworkStatusChecker;
 import com.softdesign.devintensive.utils.Validators.ValidateManager;
 import com.softdesign.devintensive.utils.eventbus.ChargingEvent;
 
@@ -128,8 +126,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     Integer mSpinnerPos = 0;
     private MainFragment dataFragment;
     private ProgressDialog pd;
-    //    @BindView(R.id.main_swaip_refresher)
-//    SwipeRefreshLayout mSwipeRefreshLayout;
     private EventBus mBus = EventBus.getDefault();
 
     @Override
@@ -162,19 +158,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         mDataManager = DataManager.getInstance();
         mMainUser = mDataManager.getPreferencesManager().loadMainUser();
-//        FragmentManager fm = getFragmentManager();
-//        dataFragment = (MainFragment) fm.findFragmentByTag("user");
-//        if (dataFragment == null) {
-//            dataFragment = new MainFragment();
-//            dataFragment.setData(mDataManager.getPreferencesManager().loadMainUser());
-//            fm.beginTransaction().add(dataFragment, "user").commit();
-//        }
-//        mMainUser = dataFragment.getData();
         setupUserProfileContent();
         mFab.setOnClickListener(this);
         mProfilePlaceholder.setOnClickListener(this);
         Log.d(TAG, "onCreate");
-        setupSwipe();//not use
         setupToolbar();
         setupDrawer();
         initUserFields();
@@ -263,57 +250,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.profile_placeholder:
                 showDialog(ConstantManager.LOAD_PROFILE_PHOTO);
                 break;
-//            uses userProfileActions
 
 
         }
     }
 
-    private void setupSwipe() {
-//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        refreshUser();
-//                        mSwipeRefreshLayout.setRefreshing(false);
-//                        Intent i = new Intent(MainActivity.this,MainActivity.this.getClass());
-////                        finish();
-//                        MainActivity.this.startActivity(i);
-//                    }
-//                }, 1000);
-//            }
-//        });
-    }
 
-    private void refreshUser() {
-        if (NetworkStatusChecker.isNetworkAvailable(this)) {
-            Call<UserRes> call = mDataManager.loginToken(mDataManager.getPreferencesManager().getUserId());
-
-            call.enqueue(new Callback<UserRes>() {
-                @Override
-                public void onResponse(Call<UserRes> call, Response<UserRes> response) {
-                    if (response.code() == 200) {
-                        if (response.body().getData() != null) {
-                            mMainUser = new MainUserDTO(response.body().getData());
-                        }
-
-                    } else {
-                        showSnackbar("Токен просрочен");
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<UserRes> call, Throwable t) {
-                    //TODO 11.07.2016 обработать ошибки
-                    t.getStackTrace();
-                }
-            });
-        } else {
-            showSnackbar("Сеть на данный момент не доступна, загружаем предыдущие данные");
-        }
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -573,8 +515,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         RestService service =
                 ServiceGenerator.createService(RestService.class);
 
-        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
-        // use the FileUtils to get the actual file by uri
         File file = null;
         if (fileUri.getScheme().equals("file")) {
             file = new File(fileUri.getPath());
@@ -686,15 +626,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     public void onClick(DialogInterface dialogInterface, int choiceItem) {
                         switch (choiceItem) {
                             case 0:
-//                                showSnackbar(getString(R.string.user_profile_dialog_gallery));
+                                showSnackbar(getString(R.string.user_profile_dialog_gallery));
                                 loadPhotoFromGallery();
                                 break;
                             case 1:
-//                                showSnackbar(getString(R.string.user_profile_dialog_camera));
+                                showSnackbar(getString(R.string.user_profile_dialog_camera));
                                 loadPhotoFromCamera();
                                 break;
                             case 2:
-//                                showSnackbar(getString(R.string.user_profile_dialog_cancel));
+                                showSnackbar(getString(R.string.user_profile_dialog_cancel));
                                 dialogInterface.cancel();
                                 break;
                         }
@@ -735,8 +675,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         Glide
                 .with(this)
                 .load(selectedImage)
-//                .resize(720,512)
-//                .fit()
                 .into(mProfileImage);
         Log.e(ConstantManager.TAG_PREFIX, "" + mNavigationDrawer.getWidth() + (int) getResources().getDimension(R.dimen.size_huge_256));
         mMainUser.setPhoto(selectedImage.toString());

@@ -184,6 +184,9 @@ public class UserListActivity extends BaseActivity {
         mConnector.runOperation(new LoadUsersFromDbOperation(), false);
     }
 
+    /**
+     * reload database by swipe
+     */
     private void setupSwipe() {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 
@@ -198,6 +201,9 @@ public class UserListActivity extends BaseActivity {
         });
     }
 
+    /**
+     * Call server for load db and include it to native web-db
+     */
     private void refreshUsersInDb() {
         pd = ProgressDialog.show(UserListActivity.this, getString(R.string.progress_dialog_up), getString(R.string.progress_dialog_mid), true, false);
         if (NetworkStatusChecker.isNetworkAvailable(this)) {
@@ -218,10 +224,9 @@ public class UserListActivity extends BaseActivity {
                                 pos++;
                             }
 
-                            mUserDao.insertOrReplaceInTx(allUsers);
-                            mRepositoryDao.insertOrReplaceInTx(allRepositories);
-//
-//                            mConnector.runOperation(new SaveUsersInDbOperation(allUsers, allRepositories), false);
+//                            mUserDao.insertOrReplaceInTx(allUsers);
+//                            mRepositoryDao.insertOrReplaceInTx(allRepositories);
+                            mConnector.runOperation(new SaveUsersInDbOperation(allUsers, allRepositories), false);
                             loadUsersFromDb();
 
                         } else {
@@ -270,11 +275,8 @@ public class UserListActivity extends BaseActivity {
     }
 
     private void refreshUsersInDb(List<User> userData) {
-//        mUserDao.deleteAll();
-//        mRepositoryDao.deleteAll();
 
         mUserDao.insertOrReplaceInTx(userData);
-//        mConnector.runOperation(new SaveUsersInDbOperation(userData,true),false);
 
     }
 
@@ -338,7 +340,6 @@ public class UserListActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-//        refreshUsersInDb(dataFragment.getData());
         mConnector.onPause();
         mBus.unregister(this);
 
@@ -394,11 +395,6 @@ public class UserListActivity extends BaseActivity {
                     public void run() {
 
                             loadUsersFromDbByQuery(mQuery);
-//                    dataFragment.setData(mDataManager.getUserListFromDbByName(newText));
-//
-////                mRecyclerView.swapAdapter(new UsersAdapter(users, mCustomClickListener), false);
-//                    mUsersAdapter = new UsersAdapter(dataFragment.getData(), mCustomClickListener);
-//                    mRecyclerView.setAdapter(mUsersAdapter);
                     }
                 };
                 mHandler.removeCallbacks(searchUsers);
@@ -440,6 +436,9 @@ public class UserListActivity extends BaseActivity {
         }
     }
 
+    /**
+     * for change position of cards and delete it
+     */
     ItemTouchHelper.SimpleCallback simpleCallbackItemTouchHelper = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT) {
 
         @Override
@@ -453,9 +452,6 @@ public class UserListActivity extends BaseActivity {
             Long fromPos = dataFragment.getData().get(fromPosition).getPosition();
             Long toPos = dataFragment.getData().get(toPosition).getPosition();
 
-//            dataFragment.getData().get(fromPosition).setId((long) (dataFragment.getData().size() + 1));
-//            dataFragment.getData().get(toPosition).setId(fromId);
-//            dataFragment.getData().get(fromPosition).setId(toId);
 
             dataFragment.getData().get(toPosition).setPosition(fromPos);
             dataFragment.getData().get(fromPosition).setPosition(toPos);
@@ -463,7 +459,6 @@ public class UserListActivity extends BaseActivity {
             mUserDao.update(dataFragment.getData().get(toPosition));
             mUserDao.update(dataFragment.getData().get(fromPosition));
 
-//            mUsersAdapter.notifyItemMoved(fromPosition, toPosition);
 
             return true;
         }
@@ -476,7 +471,7 @@ public class UserListActivity extends BaseActivity {
             mUsersAdapter.notifyDataSetChanged();
         }
     };
-
+//_________________________Chronos region__________________________
     public void onOperationFinished(final SaveUsersInDbOperation.Result result) {
         Log.d(TAG, "onOperationFinished: ");
         if (result.isSuccessful()) {
@@ -506,5 +501,5 @@ public class UserListActivity extends BaseActivity {
             Log.e(TAG, "onOperationFinished: " + result.getErrorMessage());
         }
     }
-
+//endregion
 }
