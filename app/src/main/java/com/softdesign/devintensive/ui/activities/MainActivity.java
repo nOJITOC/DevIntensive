@@ -235,14 +235,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.fab:
                 if (mCurrentEditMode == 1) {
                     mCurrentEditMode = 0;
-                    mProfilePlaceholder.setEnabled(false);
-                    mProfilePlaceholder.setVisibility(View.GONE);
-                    mProfileImage.setVisibility(View.VISIBLE);
+
                 } else if (mCurrentEditMode == 0) {
                     mCurrentEditMode = 1;
-                    mProfilePlaceholder.setEnabled(true);
-                    mProfilePlaceholder.setVisibility(View.VISIBLE);
-                    mProfileImage.setVisibility(View.GONE);
 
                 }
                 changeEditMode(mCurrentEditMode);
@@ -392,11 +387,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 userValue.setFocusableInTouchMode(true);
 
             }
+            mProfilePlaceholder.setEnabled(true);
+            mProfilePlaceholder.setVisibility(View.VISIBLE);
+            mProfileImage.setVisibility(View.GONE);
+
             mUserInfoViews.get(0).requestFocus();
             for (int i = 0; i < mUserInfoViews.size() - 1; i++) {
                 mUserInfoViews.get(i).addTextChangedListener(mValidateManager.getValidator(i));
             }
-
             if (gitSelectedView != null && gitET != null) gitET.setText(gitSelectedView.getText());
             gitET.setVisibility(View.VISIBLE);
             mGitSpinner.setVisibility(View.GONE);
@@ -412,6 +410,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             for (int i = 0; i < mUserInfoViews.size() - 1; i++) {
                 mUserInfoViews.get(i).removeTextChangedListener(mValidateManager.getValidator(i));
             }
+            mProfilePlaceholder.setEnabled(false);
+            mProfilePlaceholder.setVisibility(View.GONE);
+            mProfileImage.setVisibility(View.VISIBLE);
+
             if (gitSelectedView != null && gitET != null) gitSelectedView.setText(gitET.getText());
             gitET.setVisibility(View.GONE);
             mGitSpinner.setVisibility(View.VISIBLE);

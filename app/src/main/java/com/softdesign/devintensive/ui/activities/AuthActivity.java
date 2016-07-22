@@ -194,14 +194,14 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     private void loginSuccess(UserData userData) {
 
 
-//        String nowDate = userData.getUpdated();
-//        mMainUser=mDataManager.getPreferencesManager().loadMainUser();
-//        String oldDate = mDataManager.getPreferencesManager().getLastUpdateDate();
-//        if (nowDate.equals(oldDate) || oldDate == null||mMainUser==null) {
+        String nowDate = userData.getUpdated();
+        mMainUser=mDataManager.getPreferencesManager().loadMainUser();
+        String oldDate = mDataManager.getPreferencesManager().getLastUpdateDate();
+        if (nowDate.equals(oldDate) || oldDate == null||mMainUser==null) {
             mMainUser = new MainUserDTO(userData);
             mDataManager.getPreferencesManager().saveMainUser(mMainUser);
-//            mDataManager.getPreferencesManager().setLastUpdateDate(nowDate);
-//        }
+            mDataManager.getPreferencesManager().setLastUpdateDate(nowDate);
+        }
         toMainActivity();
 
 
