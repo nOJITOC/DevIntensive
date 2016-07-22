@@ -191,7 +191,6 @@ public class UserListActivity extends BaseActivity {
             public void onRefresh() {
 
                 refreshUsersInDb();
-                loadUsersFromDb();
                 mSwipeRefreshLayout.setRefreshing(false);
 
 
@@ -223,7 +222,7 @@ public class UserListActivity extends BaseActivity {
                             mRepositoryDao.insertOrReplaceInTx(allRepositories);
 //
 //                            mConnector.runOperation(new SaveUsersInDbOperation(allUsers, allRepositories), false);
-//                            loadUsersFromDb();
+                            loadUsersFromDb();
 
                         } else {
                             showSnackbar("Список пользователей не может быть получен");
