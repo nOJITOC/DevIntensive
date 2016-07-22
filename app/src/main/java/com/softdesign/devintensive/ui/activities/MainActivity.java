@@ -248,8 +248,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.fab:
                 if (mCurrentEditMode == 1) {
                     mCurrentEditMode = 0;
+                    mProfilePlaceholder.setEnabled(false);
+                    mProfilePlaceholder.setVisibility(View.GONE);
+                    mProfileImage.setVisibility(View.VISIBLE);
                 } else if (mCurrentEditMode == 0) {
                     mCurrentEditMode = 1;
+                    mProfilePlaceholder.setEnabled(true);
+                    mProfilePlaceholder.setVisibility(View.VISIBLE);
+                    mProfileImage.setVisibility(View.GONE);
+
                 }
                 changeEditMode(mCurrentEditMode);
                 break;

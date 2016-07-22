@@ -38,17 +38,13 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/profile_image_size">
-                        <android.support.v4.widget.SwipeRefreshLayout
-                            android:id="@+id/main_swaip_refresher"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
                         <ImageView
                             android:id="@+id/user_photo_img"
                             style="@style/app_bar"
                             android:scaleType="centerCrop"
                             android:src="@drawable/profile_photo"
                             app:layout_collapseMode="parallax"/>
-                        </android.support.v4.widget.SwipeRefreshLayout>
+
 
                         <RelativeLayout
                             android:id="@+id/profile_placeholder"
