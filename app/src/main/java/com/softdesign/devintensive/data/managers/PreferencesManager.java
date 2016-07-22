@@ -57,6 +57,7 @@ public class PreferencesManager {
     public void setLastUpdateDate(String date){
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString(ConstantManager.LAST_UPDATE, date);
+        editor.apply();
 
     }
 

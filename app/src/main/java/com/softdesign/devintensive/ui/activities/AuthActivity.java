@@ -64,30 +64,39 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     private ProgressDialog pd = null;
     private EventBus mBus;
     private ChronosConnector mConnector;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.pd = ProgressDialog.show(this, getString(R.string.progress_dialog_up), getString(R.string.progress_dialog_mid), true, false);
         setContentView(R.layout.activity_loginning);
         mConnector = new ChronosConnector();
         mConnector.onCreate(this, savedInstanceState);
-
 
 
     }
 
     @Override
     protected void onStart() {
-        this.pd = ProgressDialog.show(this, getString(R.string.progress_dialog_up),  getString(R.string.progress_dialog_mid), true, false);
+
+        mDataManager = DataManager.getInstance();
+
         Log.d(TAG, "onStart: ");
         mBus = EventBus.getDefault();
         mBus.register(this);
         ButterKnife.bind(this);
-        mDataManager = DataManager.getInstance();
+        if (!NetworkStatusChecker.isNetworkAvailable(this)) {
+
+
+            showSnackbar("Сеть не доступна, загружаем предыдущие данные");
+            if(mDataManager.getPreferencesManager().loadMainUser()!=null)
+            toMainActivity();
+        }
         mRememberPswd.setOnClickListener(this);
         mBtnSignUp.setOnClickListener(this);
-        if(mDataManager.getPreferencesManager().getAuthToken()!=null){
+        if (mDataManager.getPreferencesManager().getAuthToken() != null) {
             mBus.post(new ChargingEvent("auth"));
-        }else{
+        } else {
             pd.hide();
         }
         super.onStart();
@@ -106,12 +115,12 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void authBackgroundThread(ChargingEvent event){
+    public void authBackgroundThread(ChargingEvent event) {
         Log.i(TAG, "BusEvent" + Thread.currentThread().getName());
         mUserDao = mDataManager.getDaoSession().getUserDao();
         mRepositoryDao = mDataManager.getDaoSession().getRepositoryDao();
-        if(event.message=="auth")authByToken();
-        else if(event.message=="signIn") {
+        if (event.message == "auth") authByToken();
+        else if (event.message == "signIn") {
             signIn();
         }
 
@@ -163,7 +172,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
 
             });
         } else {
-            toMainActivity();
+            pd.hide();
         }
 
     }
@@ -172,7 +181,7 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.login_btn:
-                pd = ProgressDialog.show(this, getString(R.string.progress_dialog_up),  getString(R.string.progress_dialog_mid), true, false);
+                pd = ProgressDialog.show(this, getString(R.string.progress_dialog_up), getString(R.string.progress_dialog_mid), true, false);
                 mBus.post(new ChargingEvent("signIn"));
                 break;
             case R.id.remember_txt:
@@ -195,9 +204,9 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
 
 
         String nowDate = userData.getUpdated();
-        mMainUser=mDataManager.getPreferencesManager().loadMainUser();
+        mMainUser = mDataManager.getPreferencesManager().loadMainUser();
         String oldDate = mDataManager.getPreferencesManager().getLastUpdateDate();
-        if (nowDate.equals(oldDate) || oldDate == null||mMainUser==null) {
+        if (!nowDate.equals(oldDate) || oldDate == null || mMainUser == null) {
             mMainUser = new MainUserDTO(userData);
             mDataManager.getPreferencesManager().saveMainUser(mMainUser);
             mDataManager.getPreferencesManager().setLastUpdateDate(nowDate);
@@ -209,14 +218,16 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
 
     private void toMainActivity() {
         Handler handler = new Handler();
+
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+
                 Intent toMainActivity = new Intent(AuthActivity.this, MainActivity.class);
                 startActivity(toMainActivity);
                 pd.hide();
             }
-        },ConstantManager.RUN_DELAY);
+        }, ConstantManager.RUN_DELAY);
 
     }
 
@@ -235,14 +246,11 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                         mDataManager.getPreferencesManager().saveAuthToken(userModel.getData().getToken());
                         mDataManager.getPreferencesManager().saveUserId(userModel.getData().getUserData().getId());
                         loginSuccess(userModel.getData().getUserData());
-                        pd.hide();
                     } else if (response.code() == 403) {
                         showSnackbar("Неверный логин или пароль");
-                        pd.hide();
 
                     } else {
                         showSnackbar("Что-то пошло не так!");
-                        pd.hide();
 
 
                     }
@@ -254,14 +262,12 @@ public class AuthActivity extends BaseActivity implements View.OnClickListener {
                     //TODO 11.07.2016 обработать ошибки
                     Log.e(TAG, "onFailure: " + t.getMessage());
 
-                            toMainActivity();
+                    toMainActivity();
 
                 }
             });
         } else {
-
-            showSnackbar("Сеть на данный момент не доступна, пробуем загрузить предыдущие данные");
-            toMainActivity();
+            showSnackbar("Сеть на данный момент не доступна");
         }
 
     }
