@@ -29,12 +29,13 @@
                 app:contentScrim="@color/gray"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-                <ImageView
-                    android:id="@+id/user_photo_img"
-                    style="@style/app_bar"
-                    android:fitsSystemWindows="true"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/user_bg"/>
+                <fragment
+                    android:id="@+id/fragment_profile_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/profile_image_size"
+                    class="com.softdesign.devintensive.ui.fragments.ProfilePhotoFragment"
+                    />
+
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
@@ -52,84 +53,13 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <LinearLayout
-            style="@style/statistic_layout"
-
-            android:layout_height="@dimen/statistic_size_112"
-            android:gravity="center_vertical"
+        <fragment
+            android:layout_width="match_parent"
             app:behavior_min_height="@dimen/size_medium_56"
-            app:layout_behavior=".ui.behaviors.UserInfoBehavior"
-            >
-
-            <LinearLayout
-                style="@style/inform"
-                android:layout_weight=".25"
-                app:layout_collapseMode="pin"
-
-                >
-
-
-                <TextView
-                    android:id="@+id/dev_rating_txt"
-                    style="@style/inform_text.value"
-                    android:text="@string/rating"
-
-                    />
-
-                <TextView
-                    style="@style/inform_text.hint"
-                    android:text="@string/description_rating"/>
-
-
-            </LinearLayout>
-
-            <View
-                style="@style/line_vert"/>
-
-
-            <LinearLayout
-                style="@style/inform"
-                android:layout_weight=".50"
-                >
-
-
-                <TextView
-                    android:id="@+id/dev_code_lines_txt"
-                    style="@style/inform_text.value"
-                    android:text="@string/num_of_code_str"/>
-
-                <TextView
-                    style="@style/inform_text.hint"
-                    android:text="@string/description_num_of_code"/>
-
-
-            </LinearLayout>
-
-
-            <View
-                style="@style/line_vert"/>
-
-            <LinearLayout
-                style="@style/inform"
-                android:layout_weight=".25"
-                >
-
-
-                <TextView
-                    android:id="@+id/dev_projects_txt"
-                    style="@style/inform_text.value"
-                    android:text="@string/projects"
-
-                    />
-
-                <TextView
-                    style="@style/inform_text.hint"
-                    android:text="@string/description_projects"/>
-
-            </LinearLayout>
-
-
-        </LinearLayout>
+            app:layout_behavior = ".ui.behaviors.UserInfoBehavior"
+            android:layout_height="@dimen/statistic_size_112"
+            class="com.softdesign.devintensive.ui.fragments.StatisticFragment"
+            />
 
         <include layout="@layout/static_profile_content"/>
 

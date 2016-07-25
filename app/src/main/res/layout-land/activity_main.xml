@@ -5,19 +5,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_drawer"
     android:layout_width="match_parent"
-
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".ui.activities.MainActivity"
     >
 
 
+    <LinearLayout
+
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
         <android.support.design.widget.CoordinatorLayout
-
             android:id="@+id/main_coordinator_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
 
+            android:background="@color/gray_light">
 
             <android.support.design.widget.AppBarLayout
                 android:id="@+id/appbar_layout"
@@ -29,20 +36,33 @@
                 <android.support.design.widget.CollapsingToolbarLayout
                     android:id="@+id/collapsing_toolbar"
                     style="@style/app_bar"
+                    app:expandedTitleTextAppearance="@style/Base.TextAppearance.AppCompat.Headline"
                     android:fitsSystemWindows="true"
                     app:contentScrim="@color/gray"
-                    app:layout_scrollFlags="scroll|exitUntilCollapsed">
+                    app:layout_collapseMode="pin"
+                    >
 
+
+                    <android.support.v7.widget.Toolbar
+                        android:id="@+id/toolbar"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:titleTextColor="@color/white"
+                        app:layout_collapseMode="pin"
+                        app:theme="@style/ToolBarStyle"/>
 
                     <FrameLayout
+                        android:id="@+id/frame_photo"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/profile_image_size">
+                        android:layout_height="wrap_content">
+
                         <fragment
                             android:id="@+id/fragment_profile_image"
-                            android:layout_width="match_parent"
-                            android:layout_height="@dimen/profile_image_size"
                             class="com.softdesign.devintensive.ui.fragments.ProfilePhotoFragment"
-                                />
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            tools:layout="@layout/fragment_profile_photo"/>
 
                         <RelativeLayout
                             android:id="@+id/profile_placeholder"
@@ -73,46 +93,40 @@
 
                         </RelativeLayout>
                     </FrameLayout>
-
-                    <android.support.v7.widget.Toolbar
-                        android:id="@+id/toolbar"
-
-                        android:layout_width="wrap_content"
-                        android:layout_height="?attr/actionBarSize"
-                        android:titleTextColor="@color/white"
-                        app:layout_collapseMode="pin"
-                        app:popupTheme="@style/AppTheme.PopupOverlay"
-                        app:theme="@style/ToolBarStyle"/>
-
-
                 </android.support.design.widget.CollapsingToolbarLayout>
 
+                <fragment
+                    class="com.softdesign.devintensive.ui.fragments.StatisticFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:layout="@layout/fragment_statistic"
+                    />
 
             </android.support.design.widget.AppBarLayout>
-
-            <fragment
-                android:id="@+id/fragment_statistic"
-                android:layout_width="match_parent"
-                app:behavior_min_height="@dimen/size_medium_56"
-                app:layout_behavior = ".ui.behaviors.UserInfoBehavior"
-                android:layout_height="@dimen/statistic_size_112"
-                class="com.softdesign.devintensive.ui.fragments.StatisticFragment"
-                />
-
-            <include layout="@layout/user_profile_content"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/fba_right_space"
+                android:layout_marginTop="@dimen/fba_right_space"
                 android:src="@drawable/ic_create_black_24dp"
                 app:layout_anchor="@id/appbar_layout"
-                app:layout_anchorGravity="right|bottom"/>
+
+                app:layout_anchorGravity="right|top"/>
 
         </android.support.design.widget.CoordinatorLayout>
 
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:orientation="vertical">
 
+
+            <include layout="@layout/user_profile_content"/>
+        </LinearLayout>
+    </LinearLayout>
 
 
     <android.support.design.widget.NavigationView

@@ -13,7 +13,7 @@ public class EmailValidator extends BaseValidator {
 
     @Override
     protected boolean isValid(String target) {
-        String pattern = "^[\\w\\+\\.\\%\\-]{3,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{1,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{1,25})+$";
+        String pattern = "^[\\w\\+\\.\\%\\-]{3,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{1,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{1,25})[ ]*";
         return target.matches(pattern);
     }
 

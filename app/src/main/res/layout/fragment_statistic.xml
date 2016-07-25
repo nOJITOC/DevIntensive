@@ -1,0 +1,93 @@
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/statistic_layout"
+
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+>
+
+    <LinearLayout
+        style="@style/inform"
+        android:layout_weight=".25"
+        app:layout_collapseMode="pin"
+
+        >
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/dev_rating_txt"
+                style="@style/inform_text.value"
+                android:text="@string/rating"
+
+                />
+
+            <TextView
+                style="@style/inform_text.hint"
+                android:text="@string/description_rating"/>
+        </android.support.design.widget.TextInputLayout>
+
+
+    </LinearLayout>
+
+    <View
+        style="@style/line_vert"/>
+
+
+    <LinearLayout
+        style="@style/inform"
+        android:layout_weight=".50"
+        >
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/dev_code_lines_txt"
+                style="@style/inform_text.value"
+                android:text="@string/num_of_code_str"/>
+
+            <TextView
+                style="@style/inform_text.hint"
+                android:text="@string/description_num_of_code"/>
+        </android.support.design.widget.TextInputLayout>
+
+
+    </LinearLayout>
+
+
+    <View
+        style="@style/line_vert"/>
+
+    <LinearLayout
+        style="@style/inform"
+        android:layout_weight=".25"
+        >
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/dev_projects_txt"
+                style="@style/inform_text.value"
+                android:text="@string/projects"
+
+                />
+
+            <TextView
+                style="@style/inform_text.hint"
+                android:text="@string/description_projects"/>
+        </android.support.design.widget.TextInputLayout>
+    </LinearLayout>
+
+
+</LinearLayout>
+

@@ -2,7 +2,6 @@ package com.softdesign.devintensive.ui.activities;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,11 +21,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -48,7 +49,7 @@ import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.RestService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
 import com.softdesign.devintensive.data.storage.models.MainUserDTO;
-import com.softdesign.devintensive.ui.fragments.MainFragment;
+import com.softdesign.devintensive.ui.fragments.ProfilePhotoFragment;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.Validators.ValidateManager;
 import com.softdesign.devintensive.utils.eventbus.ChargingEvent;
@@ -118,16 +119,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     AppBarLayout mAppBarLayout;
     File mPhotoFile = null;
     Uri mSelectedImage = null;
-    @BindView(R.id.user_photo_img)
-    ImageView mProfileImage;
     @BindView(R.id.git_spiner)
     Spinner mGitSpinner;
     MainUserDTO mMainUser;
     Integer mSpinnerPos = 0;
-    private MainFragment dataFragment;
-    private ProgressDialog pd;
     private EventBus mBus = EventBus.getDefault();
-
+    ProfilePhotoFragment  mPhotoFragment;
+    FragmentManager mFragmentManager;
     @Override
     /**
      * @param savedInstanceState - значения в Bundle - состояние UI
@@ -145,7 +143,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mBus.post(new ChargingEvent("message"));
 
         if (savedInstanceState == null) {
-
         } else {
             mCurrentEditMode = savedInstanceState.getInt(ConstantManager.EDIT_MODE_KEY, 0);
             changeEditMode(mCurrentEditMode);
@@ -153,11 +150,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void mainBackgroundThread(ChargingEvent event) {
+    public void mainThread(ChargingEvent event) {
         Log.i(TAG, "BusEvent 1" + event.message);
 
         mDataManager = DataManager.getInstance();
         mMainUser = mDataManager.getPreferencesManager().loadMainUser();
+        mFragmentManager = getSupportFragmentManager();
+        mPhotoFragment=(ProfilePhotoFragment) mFragmentManager.findFragmentById(R.id.fragment_profile_image);
+        mPhotoFragment.setPhoto(mMainUser.getPhoto());
         setupUserProfileContent();
         mFab.setOnClickListener(this);
         mProfilePlaceholder.setOnClickListener(this);
@@ -166,11 +166,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setupDrawer();
         initUserFields();
         initUserInfoValue();
-        Glide.with(MainActivity.this)
-                .load(mMainUser.getPhoto())
-                .placeholder(R.drawable.nav_head_bg)
-                .error(R.drawable.nav_head_bg)
-                .into(mProfileImage);
         mValidateManager = new ValidateManager(this, mUserInfoViews);
     }
 
@@ -379,6 +374,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void changeEditMode(int mode) {
         TextView gitSelectedView = (TextView) mGitSpinner.getSelectedView();
         EditText gitET = mUserInfoViews.get(3);
+
         if (mode == 1) {
             mFab.setImageResource(R.drawable.ic_done_black_24dp);
             for (EditText userValue : mUserInfoViews) {
@@ -387,10 +383,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 userValue.setFocusableInTouchMode(true);
 
             }
-            mProfilePlaceholder.setEnabled(true);
-            mProfilePlaceholder.setVisibility(View.VISIBLE);
-            mProfileImage.setVisibility(View.GONE);
 
+            mFragmentManager.beginTransaction().detach(mPhotoFragment);
             mUserInfoViews.get(0).requestFocus();
             for (int i = 0; i < mUserInfoViews.size() - 1; i++) {
                 mUserInfoViews.get(i).addTextChangedListener(mValidateManager.getValidator(i));
@@ -398,6 +392,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             if (gitSelectedView != null && gitET != null) gitET.setText(gitSelectedView.getText());
             gitET.setVisibility(View.VISIBLE);
             mGitSpinner.setVisibility(View.GONE);
+            showProfilePlaceholder(true);
             mCollapsingToolbar.setExpandedTitleColor(Color.TRANSPARENT);
         } else {
             mFab.setImageResource(R.drawable.ic_create_black_24dp);
@@ -407,13 +402,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 userValue.setFocusableInTouchMode(false);
                 saveUserFields();
             }
+            mFragmentManager.beginTransaction().attach(mPhotoFragment);
             for (int i = 0; i < mUserInfoViews.size() - 1; i++) {
                 mUserInfoViews.get(i).removeTextChangedListener(mValidateManager.getValidator(i));
             }
-            mProfilePlaceholder.setEnabled(false);
-            mProfilePlaceholder.setVisibility(View.GONE);
-            mProfileImage.setVisibility(View.VISIBLE);
-
+            NestedScrollView nested = (NestedScrollView) findViewById(R.id.nested_scroll_for_et);
             if (gitSelectedView != null && gitET != null) gitSelectedView.setText(gitET.getText());
             gitET.setVisibility(View.GONE);
             mGitSpinner.setVisibility(View.VISIBLE);
@@ -421,7 +414,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             mMainUser.getRepositories().set(mSpinnerPos, gitET.getText().toString());
             mUserInfoViews.get(0).clearFocus();
             showProfilePlaceholder(false);
-//            lockToolbar(false);
             mCollapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.white));
 
         }
@@ -596,6 +588,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void showProfilePlaceholder(boolean cond) {
         if (cond) mProfilePlaceholder.setVisibility(View.VISIBLE);
         else mProfilePlaceholder.setVisibility(View.GONE);
+        mProfilePlaceholder.setEnabled(cond);
     }
 
     /**
@@ -674,10 +667,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * @param selectedImage
      */
     private void insertProfileImage(Uri selectedImage) {
-        Glide
-                .with(this)
-                .load(selectedImage)
-                .into(mProfileImage);
+        mPhotoFragment.setPhoto(selectedImage.toString());
         Log.e(ConstantManager.TAG_PREFIX, "" + mNavigationDrawer.getWidth() + (int) getResources().getDimension(R.dimen.size_huge_256));
         mMainUser.setPhoto(selectedImage.toString());
     }
