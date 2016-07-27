@@ -6,7 +6,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.LinearLayout;
 
 import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.utils.UIHelper;
@@ -14,7 +13,7 @@ import com.softdesign.devintensive.utils.UIHelper;
 /**
  * Created by Иван on 10.07.2016.
  */
-public class UserInfoBehavior<V extends LinearLayout> extends AppBarLayout.ScrollingViewBehavior {
+public class UserInfoBehavior<V> extends AppBarLayout.ScrollingViewBehavior {
     private final int mMaxAppbarHeight;
     private final int mMinAppbarHeight;
     private final int mMaxUserInfoHeight;

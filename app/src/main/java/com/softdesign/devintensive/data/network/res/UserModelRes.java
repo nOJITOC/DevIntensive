@@ -21,10 +21,10 @@ public class UserModelRes {
 
         @SerializedName("user")
         @Expose
-        private User user;
+        private UserData mUserData;
 
-        public User getUser() {
-            return user;
+        public UserData getUserData() {
+            return mUserData;
         }
 
         @SerializedName("token")

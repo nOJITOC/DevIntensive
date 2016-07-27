@@ -9,12 +9,12 @@ public class UserRes {
     @Expose
     private boolean success;
 
-    public User getData() {
+    public UserData getData() {
         return data;
     }
 
     @SerializedName("data")
     @Expose
-    private User data;
+    private UserData data;
 
 }

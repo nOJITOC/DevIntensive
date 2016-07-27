@@ -21,20 +21,25 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -43,8 +48,15 @@ import com.softdesign.devintensive.R;
 import com.softdesign.devintensive.data.managers.DataManager;
 import com.softdesign.devintensive.data.network.RestService;
 import com.softdesign.devintensive.data.network.ServiceGenerator;
+import com.softdesign.devintensive.data.storage.models.MainUserDTO;
+import com.softdesign.devintensive.ui.fragments.ProfilePhotoFragment;
 import com.softdesign.devintensive.utils.ConstantManager;
 import com.softdesign.devintensive.utils.Validators.ValidateManager;
+import com.softdesign.devintensive.utils.eventbus.ChargingEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.io.IOException;
@@ -90,12 +102,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     DrawerLayout mNavigationDrawer;
     @BindView(R.id.fab)
     FloatingActionButton mFab;
-    @BindViews({R.id.phone_et, R.id.email_et, R.id.vk_et, R.id.github_et, R.id.bio_et})
+    @BindViews({R.id.phone_et, R.id.email_et, R.id.vk_et, R.id.git_placeholder, R.id.bio_et})
     List<EditText> mUserInfoViews;
     @BindViews({R.id.dev_rating_txt, R.id.dev_code_lines_txt, R.id.dev_projects_txt})
     List<TextView> mUserStatisticViews;
-    @BindViews({R.id.for_phone_call, R.id.for_mail_send, R.id.for_vk_open, R.id.for_github_open})
+    @BindViews({R.id.for_phone_call, R.id.for_mail_send, R.id.for_vk_open})
     List<ImageView> mUserInfoClickers;
+    @BindView(R.id.for_github_open)
+    ImageView mGithubClicker;
     @BindView(R.id.profile_placeholder)
     RelativeLayout mProfilePlaceholder;
     @BindView(R.id.collapsing_toolbar)
@@ -105,27 +119,45 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     AppBarLayout mAppBarLayout;
     File mPhotoFile = null;
     Uri mSelectedImage = null;
-    @BindView(R.id.user_photo_img)
-    ImageView mProfileImage;
-
+    @BindView(R.id.git_spiner)
+    Spinner mGitSpinner;
+    MainUserDTO mMainUser;
+    Integer mSpinnerPos = 0;
+    private EventBus mBus = EventBus.getDefault();
+    ProfilePhotoFragment  mPhotoFragment;
+    FragmentManager mFragmentManager;
     @Override
     /**
      * @param savedInstanceState - значения в Bundle - состояние UI
      */
     protected void onCreate(Bundle savedInstanceState) {
         showProgress();
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+        mBus = EventBus.getDefault();
+        mBus.register(this);
         ButterKnife.bind(this);
-        mDataManager = DataManager.getInstance();
 
-        mValidateManager = new ValidateManager(this, mUserInfoViews);
+        mBus.post(new ChargingEvent("message"));
+
         if (savedInstanceState == null) {
-
         } else {
             mCurrentEditMode = savedInstanceState.getInt(ConstantManager.EDIT_MODE_KEY, 0);
             changeEditMode(mCurrentEditMode);
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void mainThread(ChargingEvent event) {
+        Log.i(TAG, "BusEvent 1" + event.message);
+
+        mDataManager = DataManager.getInstance();
+        mMainUser = mDataManager.getPreferencesManager().loadMainUser();
+        mFragmentManager = getSupportFragmentManager();
+        mPhotoFragment=(ProfilePhotoFragment) mFragmentManager.findFragmentById(R.id.fragment_profile_image);
+        mPhotoFragment.setPhoto(mMainUser.getPhoto());
         setupUserProfileContent();
         mFab.setOnClickListener(this);
         mProfilePlaceholder.setOnClickListener(this);
@@ -134,12 +166,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setupDrawer();
         initUserFields();
         initUserInfoValue();
-        Glide.with(MainActivity.this)
-                .load(mDataManager.getPreferencesManager().loadUserPhoto())
-                .placeholder(R.drawable.nav_head_bg)
-                .error(R.drawable.nav_head_bg)
-                .into(mProfileImage);
-
+        mValidateManager = new ValidateManager(this, mUserInfoViews);
     }
 
     /**
@@ -168,9 +195,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void onPause() {
+        mDataManager.getPreferencesManager().saveMainUser(mMainUser);
+        mBus.unregister(this);
         super.onPause();
         Log.d(TAG, "onPause");
-        saveUserFields();
 
 
     }
@@ -202,19 +230,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             case R.id.fab:
                 if (mCurrentEditMode == 1) {
                     mCurrentEditMode = 0;
+
                 } else if (mCurrentEditMode == 0) {
                     mCurrentEditMode = 1;
+
                 }
                 changeEditMode(mCurrentEditMode);
                 break;
             case R.id.profile_placeholder:
                 showDialog(ConstantManager.LOAD_PROFILE_PHOTO);
                 break;
-//            uses userProfileActions
 
 
         }
     }
+
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -234,7 +265,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setSupportActionBar(mToolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        mCollapsingToolbar.setTitle(mDataManager.getPreferencesManager().getUserFio());
+        mCollapsingToolbar.setTitle(mMainUser.getFullName());
         mAppBarParams = (AppBarLayout.LayoutParams) mCollapsingToolbar.getLayoutParams();
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
@@ -274,7 +305,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private void setupDrawer() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        setupDrawerHeader(navigationView, mDataManager.getPreferencesManager().getUserFio(), mDataManager.getPreferencesManager().getEmail());
+        setupDrawerHeader(navigationView, mMainUser.getFullName(), mMainUser.getEmail());
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -303,7 +334,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         View view = parent.getHeaderView(0);
         final ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
         Glide.with(this)
-                .load(mDataManager.getPreferencesManager().loadAvatarPhoto())
+                .load(mMainUser.getAvatar())
                 .asBitmap()
                 .centerCrop()
                 .placeholder(R.drawable.ava)
@@ -341,6 +372,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * @param mode 1-рeдактирование 0 - просмотр
      */
     private void changeEditMode(int mode) {
+        TextView gitSelectedView = (TextView) mGitSpinner.getSelectedView();
+        EditText gitET = mUserInfoViews.get(3);
+
         if (mode == 1) {
             mFab.setImageResource(R.drawable.ic_done_black_24dp);
             for (EditText userValue : mUserInfoViews) {
@@ -349,12 +383,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 userValue.setFocusableInTouchMode(true);
 
             }
+
+            mFragmentManager.beginTransaction().detach(mPhotoFragment);
             mUserInfoViews.get(0).requestFocus();
             for (int i = 0; i < mUserInfoViews.size() - 1; i++) {
                 mUserInfoViews.get(i).addTextChangedListener(mValidateManager.getValidator(i));
             }
+            if (gitSelectedView != null && gitET != null) gitET.setText(gitSelectedView.getText());
+            gitET.setVisibility(View.VISIBLE);
+            mGitSpinner.setVisibility(View.GONE);
             showProfilePlaceholder(true);
-//            lockToolbar(true);
             mCollapsingToolbar.setExpandedTitleColor(Color.TRANSPARENT);
         } else {
             mFab.setImageResource(R.drawable.ic_create_black_24dp);
@@ -364,22 +402,51 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 userValue.setFocusableInTouchMode(false);
                 saveUserFields();
             }
-            mUserInfoViews.get(0).requestFocus();
+            mFragmentManager.beginTransaction().attach(mPhotoFragment);
             for (int i = 0; i < mUserInfoViews.size() - 1; i++) {
                 mUserInfoViews.get(i).removeTextChangedListener(mValidateManager.getValidator(i));
             }
+            NestedScrollView nested = (NestedScrollView) findViewById(R.id.nested_scroll_for_et);
+            if (gitSelectedView != null && gitET != null) gitSelectedView.setText(gitET.getText());
+            gitET.setVisibility(View.GONE);
+            mGitSpinner.setVisibility(View.VISIBLE);
+            Log.e(TAG, "changeEditMode: " + mGitSpinner.indexOfChild(gitSelectedView));
+            mMainUser.getRepositories().set(mSpinnerPos, gitET.getText().toString());
+            mUserInfoViews.get(0).clearFocus();
             showProfilePlaceholder(false);
-//            lockToolbar(false);
             mCollapsingToolbar.setExpandedTitleColor(getResources().getColor(R.color.white));
 
         }
     }
 
     private void initUserFields() {
-        List<String> userData = mDataManager.getPreferencesManager().loadUserProfileData();
-        for (int i = 0; i < userData.size(); i++) {
-            mUserInfoViews.get(i).setText(userData.get(i));
+        List<String> userFields = new ArrayList<>();
+        userFields.add(mMainUser.getPhone());
+        userFields.add(mMainUser.getEmail());
+        userFields.add(mMainUser.getVk());
+        userFields.add(mMainUser.getRepositories().get(0));
+        userFields.add(mMainUser.getBio());
+        for (int i = 0; i < userFields.size(); i++) {
+            mUserInfoViews.get(i).setText(userFields.get(i));
         }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, R.layout.git_spinner_item, mMainUser.getRepositories()
+        );
+        adapter.setDropDownViewResource(R.layout.git_spinner_dropdown_item);
+        mGitSpinner.setAdapter(adapter);
+        mGitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mSpinnerPos = i;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
     }
 
     private void saveUserFields() {
@@ -387,14 +454,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         for (EditText userInfoView : mUserInfoViews) {
             userData.add(userInfoView.getText().toString());
         }
-        mDataManager.getPreferencesManager().saveUserProfileData(userData);
+        mMainUser.setPhone(userData.get(0));
+        mMainUser.setEmail(userData.get(1));
+        mMainUser.setVk(userData.get(2));
+        mMainUser.setBio(userData.get(4));
     }
 
     private void initUserInfoValue() {
-        List<String> userData = mDataManager.getPreferencesManager().loadUserProfileValue();
-        for (int i = 0; i < userData.size(); i++) {
-            mUserStatisticViews.get(i).setText(userData.get(i));
-        }
+
+        mUserStatisticViews.get(0).setText(mMainUser.getRating());
+        mUserStatisticViews.get(1).setText(mMainUser.getCodeLines());
+        mUserStatisticViews.get(2).setText(mMainUser.getProjects());
     }
 
     private void loadPhotoFromGallery() {
@@ -439,8 +509,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         RestService service =
                 ServiceGenerator.createService(RestService.class);
 
-        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
-        // use the FileUtils to get the actual file by uri
         File file = null;
         if (fileUri.getScheme().equals("file")) {
             file = new File(fileUri.getPath());
@@ -520,6 +588,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private void showProfilePlaceholder(boolean cond) {
         if (cond) mProfilePlaceholder.setVisibility(View.VISIBLE);
         else mProfilePlaceholder.setVisibility(View.GONE);
+        mProfilePlaceholder.setEnabled(cond);
     }
 
     /**
@@ -552,15 +621,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                     public void onClick(DialogInterface dialogInterface, int choiceItem) {
                         switch (choiceItem) {
                             case 0:
-//                                showSnackbar(getString(R.string.user_profile_dialog_gallery));
+                                showSnackbar(getString(R.string.user_profile_dialog_gallery));
                                 loadPhotoFromGallery();
                                 break;
                             case 1:
-//                                showSnackbar(getString(R.string.user_profile_dialog_camera));
+                                showSnackbar(getString(R.string.user_profile_dialog_camera));
                                 loadPhotoFromCamera();
                                 break;
                             case 2:
-//                                showSnackbar(getString(R.string.user_profile_dialog_cancel));
+                                showSnackbar(getString(R.string.user_profile_dialog_cancel));
                                 dialogInterface.cancel();
                                 break;
                         }
@@ -598,14 +667,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
      * @param selectedImage
      */
     private void insertProfileImage(Uri selectedImage) {
-        Glide
-                .with(this)
-                .load(selectedImage)
-//                .resize(720,512)
-//                .fit()
-                .into(mProfileImage);
+        mPhotoFragment.setPhoto(selectedImage.toString());
         Log.e(ConstantManager.TAG_PREFIX, "" + mNavigationDrawer.getWidth() + (int) getResources().getDimension(R.dimen.size_huge_256));
-        mDataManager.getPreferencesManager().saveUserPhoto(selectedImage);
+        mMainUser.setPhoto(selectedImage.toString());
     }
 
     public void openApplicationSettings() {
@@ -646,5 +710,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 }
             });
         }
+        mGithubClicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Uri uri = null;
+                String action = Intent.ACTION_DEFAULT;
+                TextView gitTV = (TextView) mGitSpinner.getSelectedView();
+                uri = Uri.parse(ConstantManager.INTENT_SCHEME[3] + gitTV.getText());
+                Intent gitBrowse = new Intent(action, uri);
+                startActivity(gitBrowse);
+            }
+        });
     }
 }

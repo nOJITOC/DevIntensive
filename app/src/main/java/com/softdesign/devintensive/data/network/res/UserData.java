@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class User {
+public class UserData {
 
 
     @SerializedName("_id")
@@ -195,6 +195,9 @@ public class User {
         @Expose
         private String title;
 
+        public String getId() {
+            return id;
+        }
     }
 
     public class Repositories {
@@ -205,7 +208,6 @@ public class User {
 
         @SerializedName("repo")
         @Expose
-
         private List<Repo> repo = new ArrayList<Repo>();
         @SerializedName("updated")
         @Expose

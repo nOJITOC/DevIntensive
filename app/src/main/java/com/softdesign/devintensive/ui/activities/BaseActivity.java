@@ -33,7 +33,7 @@ public class BaseActivity extends AppCompatActivity {
                     mProgressDialog.hide();
                 }
             }
-        }, 500);
+        }, ConstantManager.RUN_DELAY);
 
     }
     public void showError(String message,Exception error){

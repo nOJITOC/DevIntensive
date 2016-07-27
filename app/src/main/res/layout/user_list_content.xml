@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView
-    android:id="@+id/user_list"
-    android:layout_marginTop="@dimen/size_medium_56"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:paddingLeft="@dimen/spacing_normal_16"
-    android:paddingRight="@dimen/spacing_normal_16"
+    android:id="@+id/swipe_container"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_marginTop="@dimen/size_medium_56"
     >
 
-</android.support.v7.widget.RecyclerView>
+    <android.support.v7.widget.RecyclerView
+
+        android:id="@+id/user_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/spacing_normal_16"
+        android:paddingRight="@dimen/spacing_normal_16"
+        >
+
+    </android.support.v7.widget.RecyclerView>
+</android.support.v4.widget.SwipeRefreshLayout>

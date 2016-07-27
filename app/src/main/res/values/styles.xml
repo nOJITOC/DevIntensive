@@ -30,18 +30,18 @@
     <style name="icon">
         <item name="android:layout_width">@dimen/size_small_24</item>
         <item name="android:layout_height">@dimen/size_small_24</item>
+        <item name="android:layout_marginTop">@dimen/size_small_24</item>
+
     </style>
 
     <style name="icon.left" parent="icon">
         <item name="android:layout_gravity">top|left</item>
-        <item name="android:layout_marginTop">@dimen/size_small_24</item>
         <item name="android:layout_marginLeft">@dimen/spacing_normal_16</item>
     </style>
 
     <style name="icon.right" parent="icon">
         <item name="android:layout_gravity">top|right</item>
-        <item name="android:layout_marginTop">@dimen/size_small_24</item>
-        <item name="android:layout_marginRight">@dimen/spacing_medium_32</item>
+        <item name="android:layout_marginRight">@dimen/spacing_medial_24</item>
     </style>
 
     <style name="middle_layout">
@@ -52,7 +52,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">@dimen/spacing_small_8</item>
         <item name="android:paddingBottom">@dimen/spacing_small_8</item>
-        <item name="android:layout_marginLeft">@dimen/spacing_medium_32</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_medial_24</item>
         <item name="android:layout_marginRight">@dimen/spacing_normal_16</item>
         <item name="android:layout_marginTop">@dimen/spacing_small_8</item>
         <item name="android:layout_marginBottom">@dimen/spacing_small_8</item>
@@ -84,6 +84,23 @@
         <item name="android:fontFamily">sans-serif-condensed</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">bottom</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorHint">@color/gray</item>
+
+
+    </style>
+    <style name="spinner">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">bottom</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+    <style name="spinner_txt">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:layout_height">@dimen/size_big_72</item>
+        <item name="android:gravity">center_vertical</item>
         <item name="android:textColor">@color/black</item>
         <item name="android:textColorHint">@color/gray</item>
 
@@ -146,5 +163,14 @@
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
         <item name="android:actionMenuTextColor">@color/white</item>
+    </style>
+
+    <style name="git_hint">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textSize">@dimen/font_small_14</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/gray_light</item>
+        <item name="android:layout_marginLeft">@dimen/size_smaller_4</item>
     </style>
 </resources>

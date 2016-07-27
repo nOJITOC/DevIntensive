@@ -1,0 +1,9 @@
+<resources>
+
+    <!-- Base application theme. -->
+
+
+    <style name="app_bar" parent="statistic_layout">
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+</resources>
